@@ -1,0 +1,15 @@
+{
+***REMOVED*** "name": "Linux",
+***REMOVED*** "includePath": [
+***REMOVED******REMOVED***  "/usr/include/eigen3"
+***REMOVED*** ],
+***REMOVED*** "defines": [],
+***REMOVED*** "intelliSenseMode": "clang-x64",
+***REMOVED*** "browse": {
+***REMOVED******REMOVED***  "path": [
+***REMOVED******REMOVED******REMOVED******REMOVED***"/usr/include/eigen3"
+***REMOVED******REMOVED***  ],
+***REMOVED******REMOVED***  "limitSymbolsToIncludedHeaders": false,
+***REMOVED******REMOVED***  "databaseFilename": ""
+***REMOVED*** }
+}

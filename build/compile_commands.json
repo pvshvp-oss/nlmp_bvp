@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/shivanandvp/Development/nlmp_bvp/build",
+  "command": "/bin/g++***REMOVED***-I/home/shivanandvp/Development/nlmp_bvp/include -I/usr/include/eigen3  -g***REMOVED***-o CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp.cpp.o -c /home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp.cpp",
+  "file": "/home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp.cpp"
+},
+{
+  "directory": "/home/shivanandvp/Development/nlmp_bvp/build",
+  "command": "/bin/g++***REMOVED***-I/home/shivanandvp/Development/nlmp_bvp/include -I/usr/include/eigen3  -g***REMOVED***-o CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o -c /home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp_test.cpp",
+  "file": "/home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp_test.cpp"
+}
+]

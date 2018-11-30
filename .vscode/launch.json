@@ -1,0 +1,27 @@
+{
+***REMOVED*** // Use IntelliSense to learn about possible attributes.
+***REMOVED*** // Hover to view descriptions of existing attributes.
+***REMOVED*** // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+***REMOVED*** "version": "0.2.0",
+***REMOVED*** "configurations": [
+***REMOVED******REMOVED***  {
+***REMOVED******REMOVED******REMOVED******REMOVED***"name": "(gdb) Launch",
+***REMOVED******REMOVED******REMOVED******REMOVED***"type": "cppdbg",
+***REMOVED******REMOVED******REMOVED******REMOVED***"request": "launch",
+***REMOVED******REMOVED******REMOVED******REMOVED***"program": "enter program name, for example ${workspaceFolder}/a.out",
+***REMOVED******REMOVED******REMOVED******REMOVED***"args": [],
+***REMOVED******REMOVED******REMOVED******REMOVED***"stopAtEntry": false,
+***REMOVED******REMOVED******REMOVED******REMOVED***"cwd": "${workspaceFolder}",
+***REMOVED******REMOVED******REMOVED******REMOVED***"environment": [],
+***REMOVED******REMOVED******REMOVED******REMOVED***"externalConsole": true,
+***REMOVED******REMOVED******REMOVED******REMOVED***"MIMode": "gdb",
+***REMOVED******REMOVED******REMOVED******REMOVED***"setupCommands": [
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** {
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  "description": "Enable pretty-printing for gdb",
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  "text": "-enable-pretty-printing",
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  "ignoreFailures": true
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }
+***REMOVED******REMOVED******REMOVED******REMOVED***]
+***REMOVED******REMOVED***  }
+***REMOVED*** ]
+}
