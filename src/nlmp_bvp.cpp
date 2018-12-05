@@ -1,23 +1,22 @@
 #include <nlmp_bvp.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
+#include <Eigen/Eigen>
 #include <boost/array.hpp>
 #include <boost/numeric/odeint.hpp>
 #include <boost/multiprecision/eigen.hpp>
 
 using namespace Eigen;
 using namespace boost::numeric::odeint;
-typedef Matrix<double, 1, Dynamic> ArrayXd;
-typedef Matrix<int, 1, Dynamic> ArrayXi;
+typedef VectorXd state_type;
 
 int nlmp_bvp(
 ***REMOVED*** int nEquations,
-***REMOVED*** ArrayXd samples, ArrayXi nodeID,
-***REMOVED*** VectorXd (*dFunction) (double t, int intervalID),
+***REMOVED*** VectorXd (*dFunction) (double t, VectorXd x, int intervalID),
 ***REMOVED*** VectorXd (*BCFunction) (MatrixXd BC)
 ***REMOVED*** ){  
-***REMOVED******REMOVED***  int nSamples = samples.size();
-***REMOVED******REMOVED***  int nIntervals = nodeID.size() - 1;
+***REMOVED******REMOVED***  auto dFunctionWrapper = [] (const VectorXd &x, VectorXd &dxdt, double t){
+***REMOVED******REMOVED******REMOVED******REMOVED***dxdt = dFunction(t, x, 0 /*TODO: Interval ID*/);
+***REMOVED******REMOVED***  }
+
 ***REMOVED******REMOVED***  int k = 0, j = 1;  
 ***REMOVED******REMOVED***  do{
 

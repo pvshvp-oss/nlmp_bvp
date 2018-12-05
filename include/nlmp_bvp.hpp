@@ -1,10 +1,9 @@
-#include <Eigen/Dense>
-#include <Eigen/Sparse>
+#include <Eigen/Eigen>
 
 using namespace Eigen;
 
 int nlmp_bvp(
-***REMOVED*** int nEquations, int nIntervals,
-***REMOVED*** VectorXd (*dFunction) (double t, int intervalID),
+***REMOVED*** int nEquations,
+***REMOVED*** VectorXd (*dFunction) (double t, VectorXd x, int intervalID),
 ***REMOVED*** VectorXd (*BCFunction) (MatrixXd BC)
 ***REMOVED*** );
