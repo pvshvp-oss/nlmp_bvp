@@ -4,22 +4,22 @@
 using namespace std;
 
 VectorXd dFunction(double t, VectorXd x, int intervalID = 0){
-    VectorXd dxdt();
+    VectorXd dxdt(2);
     dxdt(0) = x(1);
-    dxdt(1) = 0.01*(1 - (x(0))^2)*x(1) - x(0);
+    dxdt(1) = 0.01*(1.0 - pow(x(0),2.0))*x(1) - x(0);
     return dxdt;
 }
 
 VectorXd BCFunction(MatrixXd BC){
-    VectorXd residues();
-    residues(0) = 4*BC(0,0) + (BC(1,1))^2 - 8;
-    residues(1) = (BC(0,0))^2 + 2*BC(1,1) - 5;
+    VectorXd residues(2);
+    residues(0) = 4.0*BC(0,0) + pow(BC(1,1),2.0) - 8.0;
+    residues(1) = pow(BC(0,0),2.0) + 2.0*BC(1,1) - 5.0;
     return residues;
 }
 
 int main(int argc, char **argv)
 {
-   nlmp_bvp(1, 1, dFunction, BCFunction);
+   nlmp_bvp(1, dFunction, BCFunction);
    cout << "Hello" << endl;
    return 0;
 }
