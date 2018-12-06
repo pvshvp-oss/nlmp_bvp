@@ -3,7 +3,7 @@
 
 using namespace std;
 
-VectorXd dFunction(double t, VectorXd x, int intervalID = 0){
+VectorXd dFunction(double t, VectorXd x){
     VectorXd dxdt(2);
     dxdt(0) = x(1);
     dxdt(1) = 0.01*(1.0 - pow(x(0),2.0))*x(1) - x(0);
