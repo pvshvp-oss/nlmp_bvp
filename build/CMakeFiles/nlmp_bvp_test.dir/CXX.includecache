@@ -7,23 +7,21 @@
 #IncludeRegexTransform: 
 
 ../include/nlmp_bvp.hpp
-Eigen/Dense
--
-Eigen/Sparse
+Eigen/Eigen
 -
 
 /home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp.cpp
 nlmp_bvp.hpp
 -
-Eigen/Dense
--
-Eigen/Sparse
+Eigen/Eigen
 -
 boost/array.hpp
 -
 boost/numeric/odeint.hpp
 -
 boost/multiprecision/eigen.hpp
+-
+cmath
 -
 
 /usr/include/eigen3/Eigen/Cholesky
@@ -409,6 +407,12 @@ Geometry
 /usr/include/eigen3/Eigen/Geometry
 Eigenvalues
 /usr/include/eigen3/Eigen/Eigenvalues
+
+/usr/include/eigen3/Eigen/Eigen
+Dense
+/usr/include/eigen3/Eigen/Dense
+Sparse
+/usr/include/eigen3/Eigen/Sparse
 
 /usr/include/eigen3/Eigen/Eigenvalues
 Core
