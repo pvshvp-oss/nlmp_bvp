@@ -7,6 +7,7 @@ CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp.cpp.o
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
+ /usr/include/eigen3/Eigen/Eigen
  /usr/include/eigen3/Eigen/Eigenvalues
  /usr/include/eigen3/Eigen/Geometry
  /usr/include/eigen3/Eigen/Householder
@@ -291,6 +292,7 @@ CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o
  /usr/include/eigen3/Eigen/Cholesky
  /usr/include/eigen3/Eigen/Core
  /usr/include/eigen3/Eigen/Dense
+ /usr/include/eigen3/Eigen/Eigen
  /usr/include/eigen3/Eigen/Eigenvalues
  /usr/include/eigen3/Eigen/Geometry
  /usr/include/eigen3/Eigen/Householder

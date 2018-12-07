@@ -4,6 +4,8 @@ using namespace Eigen;
 
 int nlmp_bvp(
     int nEquations,
-    VectorXd (*dFunction) (double t, VectorXd x, int intervalID),
+    VectorXd startingState,
+    VectorXd tNodes,
+    VectorXd (*dFunction) (double t, VectorXd x),
     VectorXd (*BCFunction) (MatrixXd BC)
     );

@@ -19,7 +19,9 @@ VectorXd BCFunction(MatrixXd BC){
 
 int main(int argc, char **argv)
 {
-   nlmp_bvp(1, dFunction, BCFunction);
-   cout << "Hello" << endl;
-   return 0;
+    VectorXd startingState;
+    VectorXd tNodes;
+    nlmp_bvp(2, startingState, tNodes, dFunction, BCFunction);
+    cout << "Hello" << endl;
+    return 0;
 }
