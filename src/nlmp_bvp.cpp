@@ -1,39 +1,47 @@
+// ========================
+// Includes and definitions
+// ========================
 #include <nlmp_bvp.hpp>
 #include <Eigen/Eigen>
 #include <boost/array.hpp>
 #include <boost/numeric/odeint.hpp>
 #include <boost/multiprecision/eigen.hpp>
 #include <cmath>
-
 using namespace Eigen;
 using namespace boost::numeric::odeint;
-typedef std::vector<double> state_type;
+using StateType = VectorXd;
 
 const double STEPPER_STEP = 1e-5;
+// ========================
 
+// ================
+// The BVP function
+// ================
 int nlmp_bvp(
     int nEquations,
     VectorXd startingState,
     VectorXd tNodes,
-    VectorXd (*dFunction) (double t, VectorXd x),
-    VectorXd (*BCFunction) (MatrixXd BC)
+    VectorXd dFunction(double t, VectorXd x),
+    VectorXd BCFunction(MatrixXd BC)
     ){  
-        auto dFunctionWrapper = [/*&dFunction*/] (const state_type &x, state_type &dxdt, double t){
-            // dxdt = dFunction(t, x);
-            dxdt.push_back(1.0);
-            dxdt.push_back(2.0);
+        
+        auto dFunctionWrapper = [dFunction] (const StateType &x, StateType &dxdt, double t){
+            dxdt = dFunction(t, x);
         };
+        
         int k = 0, j = 1;  
 
-        state_type startingStateDEMO;
-        startingStateDEMO.push_back(1.0);
-        startingStateDEMO.push_back(2.0);
+        StateType startingStateDEMO;
+        startingStateDEMO << 1.0, 2.0;
+
+        runge_kutta_dopri5<StateType,double,StateType,double,vector_space_algebra> stepper;
 
         do{
-            integrate(dFunctionWrapper, /*startingState*/ startingStateDEMO, tNodes(1), tNodes(tNodes.rows() - 1), STEPPER_STEP);
+            integrate_const(stepper, dFunctionWrapper, /*startingState*/ startingStateDEMO, tNodes(1), tNodes(tNodes.rows() - 1), STEPPER_STEP);
         }while(true);
         return 0;
-    }
 
+    }
+// ================
 
 
