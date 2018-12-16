@@ -47,7 +47,7 @@ src/Core/util/ReenableStupidWarnings.h
 /usr/include/eigen3/Eigen/Core
 src/Core/util/DisableStupidWarnings.h
 /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h
-math_functions.hpp
+cuda_runtime.h
 -
 new
 -
