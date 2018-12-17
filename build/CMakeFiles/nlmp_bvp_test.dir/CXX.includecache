@@ -10,10 +10,18 @@
 Eigen/Eigen
 -
 
-/home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp_test.cpp
-iostream
--
+/home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp.cpp
 nlmp_bvp.hpp
+-
+Eigen/Eigen
+-
+boost/array.hpp
+-
+boost/numeric/odeint.hpp
+-
+boost/multiprecision/eigen.hpp
+-
+cmath
 -
 
 /usr/include/eigen3/Eigen/Cholesky

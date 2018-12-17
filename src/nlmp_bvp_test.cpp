@@ -9,7 +9,7 @@ using StateType = VectorXd;
 // ========================
 
 // ===========================================================================
-// Functions that define the differential equation and its boundahy conditions
+// Functions that define the differential equation and its boundary conditions
 // ===========================================================================
 StateType dFunction(double t, StateType x){
 ***REMOVED*** StateType dxdt(2);
