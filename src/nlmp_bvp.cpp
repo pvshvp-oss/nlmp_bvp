@@ -19,25 +19,24 @@ const double STEPPER_STEP = 1e-5;
 // ================
 int nlmp_bvp(
     int nEquations,
-    VectorXd startingState,
-    VectorXd tNodes,
-    VectorXd dFunction(double t, VectorXd x),
-    VectorXd BCFunction(MatrixXd BC)
+    StateType startingState,
+    StateType tNodes,
+    StateType dFunction(double t, StateType x),
+    StateType BCFunction(MatrixXd BC)
     ){  
         
+        // Capture function calls by the ODEInt library for differentials and convert it to a custom form 
         auto dFunctionWrapper = [dFunction] (const StateType &x, StateType &dxdt, double t){
             dxdt = dFunction(t, x);
         };
         
         int k = 0, j = 1;  
 
-        StateType startingStateDEMO;
-        startingStateDEMO << 1.0, 2.0;
-
         runge_kutta_dopri5<StateType,double,StateType,double,vector_space_algebra> stepper;
 
         do{
-            integrate_const(stepper, dFunctionWrapper, /*startingState*/ startingStateDEMO, tNodes(1), tNodes(tNodes.rows() - 1), STEPPER_STEP);
+            integrate_const(stepper, dFunctionWrapper, /*startingState*/ startingState, tNodes(1), tNodes(tNodes.rows() - 1), STEPPER_STEP);
+            
         }while(true);
         return 0;
 
