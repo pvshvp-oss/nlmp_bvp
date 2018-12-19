@@ -8,14 +8,33 @@
 #include <boost/numeric/odeint.hpp>
 #include <boost/multiprecision/eigen.hpp>
 #include <nlmp_bvp.hpp>
+#include <mlinterp.hpp>
 using namespace std;
 using namespace Eigen;
 using namespace boost::numeric::odeint;
+using namespace mlinterp;
 using RowVectorXd = Matrix<double, 1, Dynamic>;
+using RowVectorXi = Matrix<int, 1, Dynamic>;
 
 const double h = 2e-3;
 const double epsilon = 10^(-8);
 // ========================
+
+struct BCs{
+***REMOVED*** MatrixXd leftBC;
+***REMOVED*** MatrixXd rightBC;
+***REMOVED*** RowVectorXd tNodes;
+}
+
+void getBoundaryColumns(int n, int m, MatrixXd xSolutions, RowVectorXd tNodes, MatrixXd &leftBC<double, n, m>, MatrixXd rightBC<double, n, m>){
+***REMOVED*** RowVectorXi boundaryColumnIndices;
+***REMOVED*** boundaryColumnIndices.resize(NoChange, m);
+***REMOVED*** boundaryColumnIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).cast<int>();
+***REMOVED*** leftBC.resize(n,m);
+***REMOVED*** rightBC.resize(n,m);
+***REMOVED*** leftBC.rightCols(m-1) = xSolutions(Eigen::placeholders::all, boundaryColumnIndices.segment(1,m-1));
+***REMOVED*** rightBC.leftCols(m-1) = xSolutions(Eigen::placeholders::all, boundaryColumnIndices.segment(0,m-2) + RowVectorXd::Ones(m-1));
+}
 
 // ================
 // The BVP function
@@ -29,16 +48,16 @@ int nlmp_bvp(
 ***REMOVED*** ){  
 ***REMOVED******REMOVED***  int k = 0;***REMOVED***  
 ***REMOVED******REMOVED***  int IVPIColumnIndex = 0;
-***REMOVED******REMOVED***  int IVPPColumnIndex = 0;
-***REMOVED******REMOVED***  int kEpsilon = 0;
+***REMOVED******REMOVED***  int IVPPColumnIndex = 0;***REMOVED******REMOVED***  
 ***REMOVED******REMOVED***  int nSamples = 0;  
+***REMOVED******REMOVED***  double kEpsilon = 0;
 ***REMOVED******REMOVED***  double t0;
 ***REMOVED******REMOVED***  double tm;***REMOVED******REMOVED***
 ***REMOVED******REMOVED***  RowVectorXd IVPITSolutions, IVPPTSolutions;
 ***REMOVED******REMOVED***  RowVectorXi boundaryColumns;
 ***REMOVED******REMOVED***  VectorXd kX0;
 ***REMOVED******REMOVED***  VectorXd pX;
-***REMOVED******REMOVED***  VectorXd S;***REMOVED******REMOVED******REMOVED***
+***REMOVED******REMOVED***  MatrixXd S;***REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED***  MatrixXd IVPIXSolutions, IVPPXSolutions; 
 ***REMOVED******REMOVED***  runge_kutta_dopri5<VectorXd,double,VectorXd,double,vector_space_algebra> stepper;
 
@@ -76,22 +95,28 @@ int nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the initial value problem***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(stepper, dFunctionWrapper, x0, t0, tm, h, odeIObserver);***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED***IVPIColumnIndex = 0;  
+
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Regular IVP solutions"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"x = "<<IVPIXSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"t = "<<IVPITSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"*************************"<<endl;
+
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(int j = 0; j < n; j++){***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Determine the perturbation parameter
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kEpsilon = max(epsilon, abs(epsilon * kX0(j,0)));
 ***REMOVED******REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Perturb the initial conditions***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** pX = kX0 + kEpsilon;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** pX = kX0 + kEpsilon*MatrixXd::Identity(n,n).col(j);
 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Solve the perturbed initial value problem***REMOVED******REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** integrate_const(stepper, dFunctionWrapper, pX, t0, tm, h, odePObserver);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** IVPPColumnIndex = 0;
 
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"x = "<<IVPXSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"t = "<<IVPTSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"*************************"<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"After integration..."<<endl;***REMOVED***  
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;***REMOVED******REMOVED******REMOVED***  
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"Perturbed IVP solutions"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"x = "<<IVPPXSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"t = "<<IVPPTSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"*************************"<<endl;  
+***REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // VectorXi boundaryColumns = (tNodes/h).cast<int>();
 ***REMOVED******REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** S.col(j) = (BCFunction(IVPPXSolutions) - BCFunction(IVPIXSolutions));
