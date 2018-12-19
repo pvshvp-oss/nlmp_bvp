@@ -6,5 +6,5 @@ CXX_FLAGS = -g
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/shivanandvp/Development/nlmp_bvp/include -I/usr/include/eigen3 
+CXX_INCLUDES = -I/home/shivanandvp/Development/nlmp_bvp/include -I/home/shivanandvp/eigen 
 
