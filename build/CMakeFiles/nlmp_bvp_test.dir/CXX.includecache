@@ -11,7 +11,9 @@ Eigen/Eigen
 -
 
 /home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp.cpp
-nlmp_bvp.hpp
+cmath
+-
+algorithm
 -
 Eigen/Eigen
 -
@@ -21,7 +23,7 @@ boost/numeric/odeint.hpp
 -
 boost/multiprecision/eigen.hpp
 -
-cmath
+nlmp_bvp.hpp
 -
 
 /usr/include/eigen3/Eigen/Cholesky
