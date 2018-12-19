@@ -6,7 +6,7 @@
 #include <Eigen/Eigen>
 #include <boost/array.hpp>
 #include <boost/numeric/odeint.hpp>
-#include <boost/multiprecision/eigen.hpp>
+// #include <boost/multiprecision/eigen.hpp>
 #include <nlmp_bvp.hpp>
 #include <mlinterp.hpp>
 using namespace std;
@@ -20,22 +20,6 @@ const double h = 2e-3;
 const double epsilon = 10^(-8);
 // ========================
 
-struct BCs{
-***REMOVED*** MatrixXd leftBC;
-***REMOVED*** MatrixXd rightBC;
-***REMOVED*** RowVectorXd tNodes;
-}
-
-void getBoundaryColumns(int n, int m, MatrixXd xSolutions, RowVectorXd tNodes, MatrixXd &leftBC<double, n, m>, MatrixXd rightBC<double, n, m>){
-***REMOVED*** RowVectorXi boundaryColumnIndices;
-***REMOVED*** boundaryColumnIndices.resize(NoChange, m);
-***REMOVED*** boundaryColumnIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).cast<int>();
-***REMOVED*** leftBC.resize(n,m);
-***REMOVED*** rightBC.resize(n,m);
-***REMOVED*** leftBC.rightCols(m-1) = xSolutions(Eigen::placeholders::all, boundaryColumnIndices.segment(1,m-1));
-***REMOVED*** rightBC.leftCols(m-1) = xSolutions(Eigen::placeholders::all, boundaryColumnIndices.segment(0,m-2) + RowVectorXd::Ones(m-1));
-}
-
 // ================
 // The BVP function
 // ================
@@ -46,13 +30,15 @@ int nlmp_bvp(
 ***REMOVED*** VectorXd dFunction(double t, VectorXd x),
 ***REMOVED*** VectorXd BCFunction(MatrixXd BC)
 ***REMOVED*** ){  
+***REMOVED******REMOVED***  int m;
 ***REMOVED******REMOVED***  int k = 0;***REMOVED***  
 ***REMOVED******REMOVED***  int IVPIColumnIndex = 0;
 ***REMOVED******REMOVED***  int IVPPColumnIndex = 0;***REMOVED******REMOVED***  
 ***REMOVED******REMOVED***  int nSamples = 0;  
 ***REMOVED******REMOVED***  double kEpsilon = 0;
 ***REMOVED******REMOVED***  double t0;
-***REMOVED******REMOVED***  double tm;***REMOVED******REMOVED***
+***REMOVED******REMOVED***  double tm;***REMOVED*** 
+***REMOVED******REMOVED***  m = tNodes.cols();  
 ***REMOVED******REMOVED***  RowVectorXd IVPITSolutions, IVPPTSolutions;
 ***REMOVED******REMOVED***  RowVectorXi boundaryColumns;
 ***REMOVED******REMOVED***  VectorXd kX0;
@@ -62,13 +48,13 @@ int nlmp_bvp(
 ***REMOVED******REMOVED***  runge_kutta_dopri5<VectorXd,double,VectorXd,double,vector_space_algebra> stepper;
 
 ***REMOVED******REMOVED***  t0 = tNodes(0);
-***REMOVED******REMOVED***  tm = tNodes(tNodes.cols()-1);
+***REMOVED******REMOVED***  tm = tNodes(m-1);
 ***REMOVED******REMOVED***  nSamples = (int)((tm - t0)/h) + 1;
 ***REMOVED******REMOVED***  IVPIXSolutions.resize(n, nSamples);
 ***REMOVED******REMOVED***  IVPITSolutions.resize(1, nSamples);
 ***REMOVED******REMOVED***  IVPPXSolutions.resize(n, nSamples);
 ***REMOVED******REMOVED***  IVPPTSolutions.resize(1, nSamples);
-***REMOVED******REMOVED***  boundaryColumns.resize(1, tNodes.cols());
+***REMOVED******REMOVED***  boundaryColumns.resize(1, m);
 ***REMOVED******REMOVED***  kX0.resize(n,1);
 ***REMOVED******REMOVED***  pX.resize(n,1);
 ***REMOVED******REMOVED***  S.resize(n,n);***REMOVED******REMOVED***  
@@ -91,15 +77,26 @@ int nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***++IVPPColumnIndex;
 ***REMOVED******REMOVED***  };***REMOVED******REMOVED***
 
+***REMOVED******REMOVED***  auto getBCs = [n, m, tNodes] (RowVectorXd IVPTSolutions, MatrixXd xSolutions) -> MatrixXd{
+***REMOVED******REMOVED******REMOVED******REMOVED***RowVectorXi BCIndices, BCIndicesNext;
+***REMOVED******REMOVED******REMOVED******REMOVED***MatrixXd BCs;
+***REMOVED******REMOVED******REMOVED******REMOVED***BCs.resize(n,m);
+***REMOVED******REMOVED******REMOVED******REMOVED***BCIndices.resize(1, m);
+***REMOVED******REMOVED******REMOVED******REMOVED***BCIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).cast<int>();
+***REMOVED******REMOVED******REMOVED******REMOVED***BCIndicesNext = BCIndices+ RowVectorXi::Ones(m);
+***REMOVED******REMOVED******REMOVED******REMOVED***BCIndices = ((tNodes.array() - IVPTSolutions(Eigen::all, BCIndices).array()) < (IVPTSolutions(Eigen::all, BCIndicesNext).array() - tNodes.array())).select(BCIndices, BCIndicesNext); 
+***REMOVED******REMOVED******REMOVED******REMOVED***return xSolutions(Eigen::all, BCIndices);
+***REMOVED******REMOVED***  };
+
 ***REMOVED******REMOVED***  do{***REMOVED******REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the initial value problem***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(stepper, dFunctionWrapper, x0, t0, tm, h, odeIObserver);***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED***IVPIColumnIndex = 0;  
 
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Regular IVP solutions"<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"x = "<<IVPIXSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"t = "<<IVPITSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"*************************"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"Regular IVP solutions"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"x = "<<IVPIXSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"t = "<<IVPITSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"*************************"<<endl;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(int j = 0; j < n; j++){***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Determine the perturbation parameter
@@ -112,14 +109,16 @@ int nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** integrate_const(stepper, dFunctionWrapper, pX, t0, tm, h, odePObserver);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** IVPPColumnIndex = 0;
 
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"Perturbed IVP solutions"<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"x = "<<IVPPXSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"t = "<<IVPPTSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"*************************"<<endl;  
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Perturbed IVP solutions"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"x = "<<IVPPXSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"t = "<<IVPPTSolutions<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"*************************"<<endl;  
 ***REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // VectorXi boundaryColumns = (tNodes/h).cast<int>();
 ***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** S.col(j) = (BCFunction(IVPPXSolutions) - BCFunction(IVPIXSolutions));
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** S.col(j) = (BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))- BCFunction(getBCs(IVPITSolutions, IVPIXSolutions)));
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"S = "<<S<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
 ***REMOVED******REMOVED******REMOVED******REMOVED***break;
 ***REMOVED******REMOVED***  }while(true);***REMOVED*** 
