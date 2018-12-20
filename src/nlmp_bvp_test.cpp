@@ -35,7 +35,6 @@ int main(int argc, char **argv)
     tNodes << 0.0, 1.0;
     startingState << 0.5, 0.5;
     nlmp_bvp(2, startingState, tNodes, dFunction, BCFunction);
-    cout << "Hello" << endl;
     return 0;
 }
 // =================

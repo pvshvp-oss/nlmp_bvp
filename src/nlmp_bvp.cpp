@@ -16,7 +16,7 @@ using namespace mlinterp;
 using RowVectorXd = Matrix<double, 1, Dynamic>;
 using RowVectorXi = Matrix<int, 1, Dynamic>;
 
-const double h = 2e-3;
+const double h =0.1;
 const double epsilon = 10^(-8);
 // ========================
 
@@ -78,13 +78,13 @@ int nlmp_bvp(
         };      
 
         auto getBCs = [n, m, tNodes] (RowVectorXd IVPTSolutions, MatrixXd xSolutions) -> MatrixXd{
-            RowVectorXi BCIndices, BCIndicesNext;
-            MatrixXd BCs;
-            BCs.resize(n,m);
+            RowVectorXi BCIndices;
             BCIndices.resize(1, m);
-            BCIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).cast<int>();
-            BCIndicesNext = BCIndices+ RowVectorXi::Ones(m);
-            BCIndices = ((tNodes.array() - IVPTSolutions(Eigen::all, BCIndices).array()) < (IVPTSolutions(Eigen::all, BCIndicesNext).array() - tNodes.array())).select(BCIndices, BCIndicesNext); 
+            BCIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).array().round().cast<int>();
+            // cout<<"<Inside getBCs>"<<endl;
+            // cout<<"BCIndices = "<<BCIndices<<endl;
+            // cout<<"xSolutions(Eigen::all, BCIndices) = "<<xSolutions(Eigen::all, BCIndices)<<endl;
+            // cout<<"</Inside getBCs>"<<endl<<endl;
             return xSolutions(Eigen::all, BCIndices);
         };
 
@@ -93,10 +93,10 @@ int nlmp_bvp(
             integrate_const(stepper, dFunctionWrapper, x0, t0, tm, h, odeIObserver);   
             IVPIColumnIndex = 0;  
 
-            // cout<<"Regular IVP solutions"<<endl;
+            // cout<<"<IVPI solutions>"<<endl;
             // cout<<"x = "<<IVPIXSolutions<<endl;
             // cout<<"t = "<<IVPITSolutions<<endl;
-            // cout<<"*************************"<<endl;
+            // cout<<"</IVPI solutions>"<<endl<<endl;
 
             for(int j = 0; j < n; j++){   
                 // Determine the perturbation parameter
@@ -109,17 +109,25 @@ int nlmp_bvp(
                 integrate_const(stepper, dFunctionWrapper, pX, t0, tm, h, odePObserver);
                 IVPPColumnIndex = 0;
 
-                // cout<<"Perturbed IVP solutions"<<endl;
+                // cout<<"<IVPP solutions>"<<endl;
                 // cout<<"x = "<<IVPPXSolutions<<endl;
                 // cout<<"t = "<<IVPPTSolutions<<endl;
-                // cout<<"*************************"<<endl;  
-       
-                // VectorXi boundaryColumns = (tNodes/h).cast<int>();
-            
-                S.col(j) = (BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))- BCFunction(getBCs(IVPITSolutions, IVPIXSolutions)));
-                cout<<"S = "<<S<<endl;
-                break;
+                // cout<<"</IVPP solutions>"<<endl<<endl;
+
+                // cout<<"<Calculated BCs>"<<endl;
+                // cout<<"BC for IVPI = "<<getBCs(IVPITSolutions, IVPIXSolutions)<<endl;
+                // cout<<"BC for IVPP = "<<getBCs(IVPPTSolutions, IVPPXSolutions)<<endl;                
+                // cout<<"</Calculated BCs>"<<endl<<endl;
+
+                // cout<<"<Calculated residues>"<<endl;
+                // cout<<"Residues for IVPI = "<<BCFunction(getBCs(IVPITSolutions, IVPIXSolutions))<<endl;
+                // cout<<"Residues for IVPP = "<<BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))<<endl;                
+                // cout<<"</Calculated residues>"<<endl<<endl;
+
+                // Compute a column of the adjsuting matrix
+                S.col(j) = (BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))- BCFunction(getBCs(IVPITSolutions, IVPIXSolutions)))/kEpsilon;                
             }
+            cout<<"S = "<<S<<endl;
             break;
         }while(true);    
         return 0;
