@@ -17,9 +17,10 @@ using RowVectorXd = Matrix<double, 1, Dynamic>;
 using RowVectorXi = Matrix<int, 1, Dynamic>;
 
 const double h = 4e-3;
-const double epsilon = 1e-8;
-const double alpha = 15;
-const double beta = 3;
+const double epsilon = 1e-10;
+const double alpha = 1;
+const double sigma = 1e-14;
+const double beta = 1e-3;
 // ========================
 
 // ================
@@ -38,6 +39,7 @@ int nlmp_bvp(
         int IVPPColumnIndex = 0;        
         int nSamples = 0;  
         double kEpsilon = 0;
+        double kAlpha = alpha;
         double t0;
         double tm;    
         double kG, kP1G;
@@ -45,11 +47,13 @@ int nlmp_bvp(
         RowVectorXd IVPITSolutions, IVPPTSolutions;
         RowVectorXi boundaryColumns;
         VectorXd kX0;
+        VectorXd kX0Temp;
         VectorXd pX;
         VectorXd gkX0;
         MatrixXd S;         
         MatrixXd IVPIXSolutions, IVPPXSolutions; 
-        runge_kutta_dopri5<VectorXd,double,VectorXd,double,vector_space_algebra> stepper;
+        runge_kutta_dopri5<VectorXd,double,VectorXd,double,vector_space_algebra> IVPIStepper;
+        runge_kutta_dopri5<VectorXd,double,VectorXd,double,vector_space_algebra> IVPPStepper;
 
         t0 = tNodes(0);
         tm = tNodes(m-1);
@@ -60,9 +64,10 @@ int nlmp_bvp(
         IVPPTSolutions.resize(1, nSamples);
         boundaryColumns.resize(1, m);
         kX0.resize(n,1);
+        kX0Temp.resize(n,1);
         gkX0.resize(n,1);
         pX.resize(n,1);
-        S.resize(n,n);        
+        S.resize(n,n);       
         kX0 = x0;
 
         // Capture function calls by the ODEInt library for differentials and convert it to a custom form 
@@ -86,91 +91,70 @@ int nlmp_bvp(
             RowVectorXi BCIndices;
             BCIndices.resize(1, m);
             BCIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).array().round().cast<int>();
-            // cout<<"<Inside getBCs>"<<endl;
-            // cout<<"BCIndices = "<<BCIndices<<endl;
-            // cout<<"xSolutions(Eigen::all, BCIndices) = "<<xSolutions(Eigen::all, BCIndices)<<endl;
-            // cout<<"</Inside getBCs>"<<endl<<endl;
             return xSolutions(Eigen::all, BCIndices);
-        };
+        };        
 
         // Solve the initial value problem for the first time  
-        integrate_const(stepper, dFunctionWrapper, kX0, t0, tm, h, odeIObserver);  
+        kX0Temp = kX0;
+        integrate_const(IVPIStepper, dFunctionWrapper, kX0Temp, t0, tm, h, odeIObserver); 
         IVPIColumnIndex = 0;  
         gkX0 = BCFunction(getBCs(IVPITSolutions, IVPIXSolutions));
-        kG = gkX0.norm();
-        // cout<<"<IVPI solutions>"<<endl;
-        // cout<<"x = "<<IVPIXSolutions<<endl;
-        // cout<<"t = "<<IVPITSolutions<<endl;
-        // cout<<"</IVPI solutions>"<<endl<<endl;
-        do{          
+        // cout<<"gkX0 = "<<endl<<gkX0<<endl;
+        kP1G = gkX0.norm();
+        kG = kP1G;
+        while(kP1G > sigma){  
+            if(kP1G < 0.1*kG) {
+                cout<<"Going too fast. Changing alpha from "<<kAlpha<<" to "<<min(1.2*kAlpha, 1.0)<<"..."<<endl;
+                kAlpha = min(1.2*kAlpha, 1.0);                
+            } else if(kP1G >= kG){
+                cout<<"Oops. Error increased. To make it go faster, changing alpha from "<<kAlpha<<" to "<<0.8*kAlpha<<"..."<<endl;
+                kAlpha = 0.8*kAlpha;
+            }     
             for(int j = 0; j < n; j++){   
                 // Determine the perturbation parameter
-                kEpsilon = max(epsilon, abs(epsilon * kX0(j,0)));
+                kEpsilon = max(epsilon, abs(epsilon * kX0(j)));
                 //kEpsilon = epsilon;
             
                 // Perturb the initial conditions            
                 pX = kX0 + kEpsilon*MatrixXd::Identity(n,n).col(j);
-
+                
                 // Solve the perturbed initial value problem            
-                integrate_const(stepper, dFunctionWrapper, pX, t0, tm, h, odePObserver);
+                integrate_const(IVPPStepper, dFunctionWrapper, pX, t0, tm, h, odePObserver);
                 IVPPColumnIndex = 0;
-                // cout<<"<IVPP solutions>"<<endl;
-                // cout<<"x = "<<IVPPXSolutions<<endl;
-                // cout<<"t = "<<IVPPTSolutions<<endl;
-                // cout<<"</IVPP solutions>"<<endl<<endl;
-
-                // cout<<"<Calculated BCs>"<<endl;
-                // cout<<"BC for IVPI = "<<getBCs(IVPITSolutions, IVPIXSolutions)<<endl;
-                // cout<<"BC for IVPP = "<<getBCs(IVPPTSolutions, IVPPXSolutions)<<endl;                
-                // cout<<"</Calculated BCs>"<<endl<<endl;
-                // cout<<"<Calculated residues>"<<endl;
-                // cout<<"Residues for IVPI = "<<BCFunction(getBCs(IVPITSolutions, IVPIXSolutions))<<endl;
-                // cout<<"Residues for IVPP = "<<BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))<<endl;                
-                // cout<<"</Calculated residues>"<<endl<<endl;
 
                 // Compute a column of the adjusting matrix                
                 S.col(j) = (BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))- gkX0)/kEpsilon;                
+                // cout<<"gkxp = "<<endl<<BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))<<endl;
             }
+            // cout<<"S = "<<endl<<S<<endl;
 
             // Solve the linarized adjusting equation
-            kX0 = S.colPivHouseholderQr().solve(-gkX0) + kX0;
+            kX0 = S.colPivHouseholderQr().solve(-kAlpha*gkX0) + kX0;
 
             // Solve the initial value problem   
-            integrate_const(stepper, dFunctionWrapper, kX0, t0, tm, h, odeIObserver);   
+            kX0Temp = kX0;
+            integrate_const(IVPIStepper, dFunctionWrapper, kX0Temp, t0, tm, h, odeIObserver);   
             IVPIColumnIndex = 0; 
             gkX0 = BCFunction(getBCs(IVPITSolutions, IVPIXSolutions));
-            // cout<<"<IVPI solutions>"<<endl;
-            // cout<<"x = "<<IVPIXSolutions<<endl;
-            // cout<<"t = "<<IVPITSolutions<<endl;
-            // cout<<"</IVPI solutions>"<<endl<<endl;
-
-            kP1G = gkX0.norm();
-
-            if(kP1G <= pow(10, -alpha)){
-                cout<<"Stopping criterion reached..."<<endl;
-                cout<<"<IVPI solutions>"<<endl;
-                cout<<"x(t0) = "<<IVPIXSolutions.col(0)<<endl;
-                cout<<"x(tm) = "<<IVPIXSolutions.col(m-1)<<endl;
-                cout<<"t = "<<tNodes<<endl;
-                cout<<"</IVPI solutions>"<<endl<<endl;
-                break;
-            } else if(pow(10, -alpha) < kP1G && kP1G <= pow(10, -beta) && kP1G/kG < 1){                
-                ++k;           
-                cout<<"Stopping conditon = "<<kP1G - pow(10, -alpha)<<endl;
-                cout<<"Proceeding for iteration "<<k<<"..."<<endl;
-            } else{
-                cout<<"Singular problem..."<<endl;
-                cout<<"k = "<<endl;
-                cout<<"pow(10, -alpha) = "<<pow(10, -alpha)<<endl;
-                cout<<"kP1G = "<<kP1G<<endl;
-                cout<<"pow(10, -beta) = "<<pow(10, -beta)<<endl;
-                cout<<"kG = "<<kG<<endl;
-                cout<<"kP1G/kG = "<<kP1G/kG<<endl;
-                break;
-            }
 
             kG = kP1G;
-        }while(true);    
+            kP1G = gkX0.norm()/sqrt(n);
+            cout<<"kP1G = "<<kP1G<<endl;
+            ++k;
+        }  
+        cout<<"x(0) = "<<endl<<IVPIXSolutions.col(0)<<endl;
+        cout<<"x(nSamples-1) = "<<endl<<IVPIXSolutions.col(nSamples-1)<<endl;
+        //x0 = x0 + epsilon*MatrixXd::Identity(n,n).col(0);
+        // pX = kX0 + kEpsilon*MatrixXd::Identity(n,n).col(0);
+        // integrate_const(IVPPStepper, dFunctionWrapper, x0, t0, tm, h, odePObserver);
+        // IVPPColumnIndex = 0; 
+
+        // Perturb the initial conditions            
+        // x0 = x0 + kEpsilon*MatrixXd::Identity(n,n).col(1);                
+        // Solve the perturbed initial value problem            
+        // integrate_const(IVPPStepper, dFunctionWrapper, x0, t0, tm, h, odePObserver);
+        // IVPPColumnIndex = 0;
+        // cout<<"Check BCs = "<<endl<<BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))<<endl;
         return 0;
     }
 // ================
