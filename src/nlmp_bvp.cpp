@@ -16,7 +16,7 @@ using namespace mlinterp;
 using RowVectorXd = Matrix<double, 1, Dynamic>;
 using RowVectorXi = Matrix<int, 1, Dynamic>;
 
-const double h = 2e-3;
+const double h =0.1;
 const double epsilon = 10^(-8);
 // ========================
 
@@ -78,13 +78,13 @@ int nlmp_bvp(
 ***REMOVED******REMOVED***  };***REMOVED******REMOVED***
 
 ***REMOVED******REMOVED***  auto getBCs = [n, m, tNodes] (RowVectorXd IVPTSolutions, MatrixXd xSolutions) -> MatrixXd{
-***REMOVED******REMOVED******REMOVED******REMOVED***RowVectorXi BCIndices, BCIndicesNext;
-***REMOVED******REMOVED******REMOVED******REMOVED***MatrixXd BCs;
-***REMOVED******REMOVED******REMOVED******REMOVED***BCs.resize(n,m);
+***REMOVED******REMOVED******REMOVED******REMOVED***RowVectorXi BCIndices;
 ***REMOVED******REMOVED******REMOVED******REMOVED***BCIndices.resize(1, m);
-***REMOVED******REMOVED******REMOVED******REMOVED***BCIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).cast<int>();
-***REMOVED******REMOVED******REMOVED******REMOVED***BCIndicesNext = BCIndices+ RowVectorXi::Ones(m);
-***REMOVED******REMOVED******REMOVED******REMOVED***BCIndices = ((tNodes.array() - IVPTSolutions(Eigen::all, BCIndices).array()) < (IVPTSolutions(Eigen::all, BCIndicesNext).array() - tNodes.array())).select(BCIndices, BCIndicesNext); 
+***REMOVED******REMOVED******REMOVED******REMOVED***BCIndices = ((tNodes-tNodes(0)*RowVectorXd::Ones(m))/h).array().round().cast<int>();
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"<Inside getBCs>"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"BCIndices = "<<BCIndices<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"xSolutions(Eigen::all, BCIndices) = "<<xSolutions(Eigen::all, BCIndices)<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"</Inside getBCs>"<<endl<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***return xSolutions(Eigen::all, BCIndices);
 ***REMOVED******REMOVED***  };
 
@@ -93,10 +93,10 @@ int nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(stepper, dFunctionWrapper, x0, t0, tm, h, odeIObserver);***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED***IVPIColumnIndex = 0;  
 
-***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"Regular IVP solutions"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"<IVPI solutions>"<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"x = "<<IVPIXSolutions<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"t = "<<IVPITSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"*************************"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"</IVPI solutions>"<<endl<<endl;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(int j = 0; j < n; j++){***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Determine the perturbation parameter
@@ -109,17 +109,25 @@ int nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** integrate_const(stepper, dFunctionWrapper, pX, t0, tm, h, odePObserver);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** IVPPColumnIndex = 0;
 
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Perturbed IVP solutions"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"<IVPP solutions>"<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"x = "<<IVPPXSolutions<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"t = "<<IVPPTSolutions<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"*************************"<<endl;  
-***REMOVED******REMOVED*** 
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // VectorXi boundaryColumns = (tNodes/h).cast<int>();
-***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** S.col(j) = (BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))- BCFunction(getBCs(IVPITSolutions, IVPIXSolutions)));
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"S = "<<S<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"</IVPP solutions>"<<endl<<endl;
+
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"<Calculated BCs>"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"BC for IVPI = "<<getBCs(IVPITSolutions, IVPIXSolutions)<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"BC for IVPP = "<<getBCs(IVPPTSolutions, IVPPXSolutions)<<endl;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"</Calculated BCs>"<<endl<<endl;
+
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"<Calculated residues>"<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Residues for IVPI = "<<BCFunction(getBCs(IVPITSolutions, IVPIXSolutions))<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Residues for IVPP = "<<BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))<<endl;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"</Calculated residues>"<<endl<<endl;
+
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Compute a column of the adjsuting matrix
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** S.col(j) = (BCFunction(getBCs(IVPPTSolutions, IVPPXSolutions))- BCFunction(getBCs(IVPITSolutions, IVPIXSolutions)))/kEpsilon;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"S = "<<S<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***break;
 ***REMOVED******REMOVED***  }while(true);***REMOVED*** 
 ***REMOVED******REMOVED***  return 0;
