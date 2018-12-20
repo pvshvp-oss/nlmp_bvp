@@ -8,7 +8,7 @@
 ***REMOVED******REMOVED******REMOVED******REMOVED***"name": "(gdb) Launch",
 ***REMOVED******REMOVED******REMOVED******REMOVED***"type": "cppdbg",
 ***REMOVED******REMOVED******REMOVED******REMOVED***"request": "launch",
-***REMOVED******REMOVED******REMOVED******REMOVED***"program": "enter program name, for example ${workspaceFolder}/a.out",
+***REMOVED******REMOVED******REMOVED******REMOVED***"program": "${workspaceFolder}/bin/nlmp_bvp_test",
 ***REMOVED******REMOVED******REMOVED******REMOVED***"args": [],
 ***REMOVED******REMOVED******REMOVED******REMOVED***"stopAtEntry": false,
 ***REMOVED******REMOVED******REMOVED******REMOVED***"cwd": "${workspaceFolder}",

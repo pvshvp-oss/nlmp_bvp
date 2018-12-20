@@ -1,0 +1,12 @@
+{
+***REMOVED*** // See https://go.microsoft.com/fwlink/?LinkId=733558
+***REMOVED*** // for the documentation about the tasks.json format
+***REMOVED*** "version": "2.0.0",
+***REMOVED*** "tasks": [
+***REMOVED******REMOVED***  {
+***REMOVED******REMOVED******REMOVED******REMOVED***"label": "echo",
+***REMOVED******REMOVED******REMOVED******REMOVED***"type": "shell",
+***REMOVED******REMOVED******REMOVED******REMOVED***"command": "echo Hello"
+***REMOVED******REMOVED***  }
+***REMOVED*** ]
+}
