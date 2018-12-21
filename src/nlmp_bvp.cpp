@@ -66,6 +66,8 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  h***REMOVED******REMOVED***= (tm - t0)/(nGrid-1);
 ***REMOVED******REMOVED***  BCCols = ((t_BC-t0*RowVectorXd::Ones(m))/h).array().round().cast<int>();
 
+***REMOVED******REMOVED***  cout<<"BCCols = "<<BCCols<<endl;
+
 ***REMOVED******REMOVED***  // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
 ***REMOVED******REMOVED***  auto dxBydtWrapper = [dxBydt] // Captured variables
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  (const VectorXd &x, VectorXd &dxdt, double t){
@@ -127,11 +129,10 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
 
+***REMOVED******REMOVED******REMOVED******REMOVED***VectorXd temp = _k_x_t1;
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
-
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"det(S) = "<<_k_S.determinant();<<endl;
-
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Difference = "<<endl<<_k_S*(_k_x_t1 - temp) + _k_alpha*_k_g<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_GPrev = _k_G;
 ***REMOVED******REMOVED******REMOVED******REMOVED***++k;
 
