@@ -54,14 +54,14 @@ int main(
 ***REMOVED*** cout<<"Program started..."<<endl;
 
 ***REMOVED*** // Variable declarations***REMOVED***
-***REMOVED*** RowVectorXd t_BC(4);***REMOVED******REMOVED******REMOVED*** // t_BC***REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
-***REMOVED*** VectorXd _0x_t1(6);***REMOVED******REMOVED******REMOVED***  // _0x_t1***REMOVED******REMOVED***= column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
-***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED***// bvpSolution = the structure in which the solutions of the boundary value problem will be saved
+***REMOVED*** RowVectorXd t_BC(4);***REMOVED******REMOVED******REMOVED*** // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
+***REMOVED*** VectorXd _0_x_t1(6);***REMOVED******REMOVED******REMOVED*** // _0_x_t1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
+***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED***// bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters ivamParameters // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
-***REMOVED*** // Variable assignments
-***REMOVED*** t_BC***REMOVED***<< 0.0, 0.8, 1.4, 2;
-***REMOVED*** _0x_t1 << 1.07600,
+***REMOVED*** // Variable definitions
+***REMOVED*** t_BC***REMOVED*** << 0.0, 0.8, 1.4, 2;
+***REMOVED*** _0_x_t1 << 1.07600,
 ***REMOVED******REMOVED******REMOVED******REMOVED***  0.53800,
 ***REMOVED******REMOVED******REMOVED******REMOVED***  0.00000,
 ***REMOVED******REMOVED******REMOVED******REMOVED***  0.28800,
@@ -75,7 +75,7 @@ int main(
 ***REMOVED*** cout<<"Initiating the BVP solver..."<<endl;
 ***REMOVED*** 
 ***REMOVED*** // Solve the boundary value problem
-***REMOVED*** bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0x_t1, dxBydt, BCResidue, ivamParameters);
+***REMOVED*** bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0_x_t1, dxBydt, BCResidue, ivamParameters);
 
 ***REMOVED*** cout<<"Done solving the BVP..."<<endl;
 
