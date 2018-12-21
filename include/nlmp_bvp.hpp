@@ -39,7 +39,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED*** RowVectorXd t_BC,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED*** VectorXd _0_x_t1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // _0_x_t1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)***REMOVED*** 
 ***REMOVED*** VectorXd dxBydt(double t, VectorXd x), // dxBydt***REMOVED******REMOVED******REMOVED***= a function that defines the derivative of a state vector x at t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
-***REMOVED*** VectorXd BCResidue(MatrixXd x_BC)***REMOVED******REMOVED***// BCResidue***REMOVED******REMOVED***= a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+***REMOVED*** VectorXd BCResidues(MatrixXd x_BC)***REMOVED***  // BCResidues***REMOVED***  = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
 ***REMOVED*** const IVAMParameters ivamParameters***REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 ***REMOVED*** );
 // ===================

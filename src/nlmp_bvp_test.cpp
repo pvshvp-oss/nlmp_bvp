@@ -25,18 +25,18 @@ VectorXd dxBydt(double t, VectorXd x){
 }
 // ================
 
-// ===================
-// Functions BCResidue
-// ===================
-// BCResidue = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
-VectorXd BCResidue(MatrixXd BC){
+// ====================
+// Functions BCResidues
+// ====================
+// BCResidues = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+VectorXd BCResidues(MatrixXd x_BC){
 ***REMOVED*** VectorXd residues(6);
-***REMOVED*** residues(0) = BC(0,0) - 1.076;
-***REMOVED*** residues(1) = BC(1,0) + pow(BC(1,0),2) + BC(1,1) + BC(1,2) + BC(1,3) + 2.053292953504164;
-***REMOVED*** residues(2) = BC(2,0) + BC(3,0) - 0.472283099142472;
-***REMOVED*** residues(3) = pow(BC(3,1),2) + BC(4,2) - 1.040204804411078;
-***REMOVED*** residues(4) = BC(2,3) + BC(4,3) - 1.57661; 
-***REMOVED*** residues(5) = BC(5,3) + 0.03407297218269353;
+***REMOVED*** residues(0) = x_BC(0,0) - 1.076;
+***REMOVED*** residues(1) = x_BC(1,0) + pow(x_BC(1,0),2) + x_BC(1,1) + x_BC(1,2) + x_BC(1,3) + 2.053292953504164;
+***REMOVED*** residues(2) = x_BC(2,0) + x_BC(3,0) - 0.472283099142472;
+***REMOVED*** residues(3) = pow(x_BC(3,1),2) + x_BC(4,2) - 1.040204804411078;
+***REMOVED*** residues(4) = x_BC(2,3) + x_BC(4,3) - 1.57661; 
+***REMOVED*** residues(5) = x_BC(5,3) + 0.03407297218269353;
 ***REMOVED*** return residues;
 }
 // ===================
@@ -75,7 +75,7 @@ int main(
 ***REMOVED*** cout<<"Initiating the BVP solver..."<<endl;
 ***REMOVED*** 
 ***REMOVED*** // Solve the boundary value problem
-***REMOVED*** bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0_x_t1, dxBydt, BCResidue, ivamParameters);
+***REMOVED*** bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0_x_t1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** cout<<"Done solving the BVP..."<<endl;
 
