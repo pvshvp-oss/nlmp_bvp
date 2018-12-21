@@ -33,44 +33,33 @@ BVPSolution nlmp_bvp(
 ***REMOVED*** const IVAMParameters ivamParameters***REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 ***REMOVED*** ){  
 
-***REMOVED******REMOVED***  // Variable declarations
-***REMOVED******REMOVED***  int j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // j = the inner iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- [0,n-1]
-***REMOVED******REMOVED***  int k;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // k = the outer iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- [0,Inf)
-***REMOVED******REMOVED***  int iCol;***REMOVED******REMOVED******REMOVED******REMOVED*** // iCol = the column index of the x solution for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED***-- [0,nGrid-1]
-***REMOVED******REMOVED***  int iColP;***REMOVED******REMOVED******REMOVED******REMOVED***// iColP = the column index of the perturbed x solution for the IVP solver -- [0,nGrid-1] 
-***REMOVED******REMOVED***  double t0;***REMOVED******REMOVED******REMOVED******REMOVED***// t0 = the first boundary value of the independent variable
-***REMOVED******REMOVED***  double tm;***REMOVED******REMOVED******REMOVED******REMOVED***// tm = the last boundary value of the independent variable
-***REMOVED******REMOVED***  double _k_epsilon_J;  // _k_epsilon_J = the perturbation parameter for a state variable at a particular iteration k
-***REMOVED******REMOVED***  double _k_alpha;***REMOVED******REMOVED***// _k_alpha = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
-***REMOVED******REMOVED***  double _k_G;***REMOVED******REMOVED******REMOVED*** // _k_G = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
-***REMOVED******REMOVED***  double _k_GPrev;***REMOVED******REMOVED***// _k_GPrev = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
-***REMOVED******REMOVED***  RowVectorXd _k_tSol;  // _k_tSol = the independent variable t over the whole grid in the solution of the IVP solver -- (1xnGrid)
-***REMOVED******REMOVED***  MatrixXd _k_xSol;***REMOVED***  // _k_xSol = the state vector x integrated over the whole grid in the solution of the IVP solver -- (nxnGrid)
-***REMOVED******REMOVED***  RowVectorXd _t_solPJ; // _t_solPJ = the independent variable t over the whole grid in the perturbed solution of the IVP solver -- (1xnGrid)***REMOVED*** 
-***REMOVED******REMOVED***  MatrixXd _x_solPJ;***REMOVED*** // _x_solPJ = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver -- (nxnGrid)
-***REMOVED******REMOVED***  VectorXd _k_x_t1;***REMOVED***  // _k_x_t1 = the computed initial state vector in the k-th iteration -- (nx1)
-***REMOVED******REMOVED***  VectorXd _k_x_t1P;***REMOVED*** // _k_x_t1 = the computed perturbed initial state vector in the k-th iteration -- (nx1)
-***REMOVED******REMOVED***  VectorXd x_t1;***REMOVED******REMOVED***  // x_t1 = the computed initial state vector to be input to the IVP solver -- (nx1)
-***REMOVED******REMOVED***  VectorXd x_t1P;***REMOVED******REMOVED*** // x_t1P = the computed perturbed initial state vector to be input to the IVP solver -- (nx1)
-***REMOVED******REMOVED***  VectorXd _k_g;***REMOVED******REMOVED***  // _k_g = the boundary condition residues in the k-th iteration -- (nx1)
-***REMOVED******REMOVED***  MatrixXd _k_S;***REMOVED******REMOVED***  // _k_S = the adjusting matrix for correcting the initial condition k-th iteration --(nxn) 
-***REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED***  runge_kutta_dopri5<VectorXd,double,VectorXd,double,vector_space_algebra> IVPIStepper;
-***REMOVED******REMOVED***  runge_kutta_dopri5<VectorXd,double,VectorXd,double,vector_space_algebra> IVPPStepper;
+***REMOVED******REMOVED***  // Variable declarations***REMOVED******REMOVED***  
+***REMOVED******REMOVED***  int j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // j***REMOVED******REMOVED******REMOVED******REMOVED***= the inner iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,n-1]
+***REMOVED******REMOVED***  int k;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // k***REMOVED******REMOVED******REMOVED******REMOVED***= the outer iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,Inf)
+***REMOVED******REMOVED***  int iCol;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // iCol***REMOVED******REMOVED******REMOVED***= the column index of the x solution for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- [0,nGrid-1]
+***REMOVED******REMOVED***  int iColP;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // iColP***REMOVED******REMOVED***  = the column index of the perturbed x solution for the IVP solver***REMOVED***
+***REMOVED******REMOVED***  double h;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // h***REMOVED******REMOVED******REMOVED******REMOVED***= the stepper step size for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- [0,nGrid-1] 
+***REMOVED******REMOVED***  double t0;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // t0***REMOVED******REMOVED******REMOVED***  = the first boundary value of the independent variable
+***REMOVED******REMOVED***  double tm;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // tm***REMOVED******REMOVED******REMOVED***  = the last boundary value of the independent variable
+***REMOVED******REMOVED***  double _k_epsilon_J;***REMOVED******REMOVED******REMOVED***// _k_epsilon_J = the perturbation parameter for a state variable at a particular iteration k
+***REMOVED******REMOVED***  double _k_alpha;***REMOVED******REMOVED******REMOVED******REMOVED*** // _k_alpha***REMOVED***  = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
+***REMOVED******REMOVED***  double _k_G;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // _k_G***REMOVED******REMOVED******REMOVED***= the Root Mean Square (RMS) error of boundary residues at a particular iteration k
+***REMOVED******REMOVED***  double _k_GPrev;***REMOVED******REMOVED******REMOVED******REMOVED*** // _k_GPrev***REMOVED***  = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
+***REMOVED******REMOVED***  RowVectorXd _k_tSol(nGrid);  // _k_tSol***REMOVED******REMOVED***= the independent variable t over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (1xnGrid)
+***REMOVED******REMOVED***  MatrixXd _k_xSol(n,nGrid);***REMOVED***// _k_xSol***REMOVED******REMOVED***= the state vector x integrated over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nxnGrid)
+***REMOVED******REMOVED***  RowVectorXd _t_solPJ(nGrid); // _t_solPJ***REMOVED***  = the independent variable t over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED******REMOVED***-- (1xnGrid)***REMOVED*** 
+***REMOVED******REMOVED***  MatrixXd _x_solPJ(n,nGrid);  // _x_solPJ***REMOVED***  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED***-- (nxnGrid)
+***REMOVED******REMOVED***  VectorXd _k_x_t1(n);***REMOVED******REMOVED******REMOVED***// _k_x_t1***REMOVED******REMOVED***= the computed initial state vector in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
+***REMOVED******REMOVED***  VectorXd _k_x_t1P(n);***REMOVED******REMOVED***  // _k_x_t1***REMOVED******REMOVED***= the computed perturbed initial state vector in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
+***REMOVED******REMOVED***  VectorXd x_t1(n);***REMOVED******REMOVED******REMOVED******REMOVED***// x_t1***REMOVED******REMOVED******REMOVED***= the computed initial state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+***REMOVED******REMOVED***  VectorXd x_t1P(n);***REMOVED******REMOVED******REMOVED***  // x_t1P***REMOVED******REMOVED***  = the computed perturbed initial state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
+***REMOVED******REMOVED***  VectorXd _k_g(n);***REMOVED******REMOVED******REMOVED******REMOVED***// _k_g***REMOVED******REMOVED******REMOVED***= the boundary condition residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
+***REMOVED******REMOVED***  MatrixXd _k_S(n,n);***REMOVED******REMOVED******REMOVED*** // _k_S***REMOVED******REMOVED******REMOVED***= the adjusting matrix for correcting the initial condition k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nxn) 
 
+***REMOVED******REMOVED***  // Variable definitions
+***REMOVED******REMOVED***  h = (tm - t0)/nGrid;
 ***REMOVED******REMOVED***  t0 = t_BC(0);
 ***REMOVED******REMOVED***  tm = t_BC(m-1);
-***REMOVED******REMOVED***  nGrid = floor((tm - t0)/h) + 1;
-***REMOVED******REMOVED***  IVPIXSolutions.resize(n, nGrid);
-***REMOVED******REMOVED***  IVPITSolutions.resize(1, nGrid);
-***REMOVED******REMOVED***  IVPPXSolutions.resize(n, nGrid);
-***REMOVED******REMOVED***  IVPPTSolutions.resize(1, nGrid);
-***REMOVED******REMOVED***  kX0.resize(n,1);
-***REMOVED******REMOVED***  kX0Temp.resize(n,1);
-***REMOVED******REMOVED***  gkX0.resize(n,1);
-***REMOVED******REMOVED***  pX.resize(n,1);
-***REMOVED******REMOVED***  S.resize(n,n);***REMOVED******REMOVED*** 
-***REMOVED******REMOVED***  kX0 = x0;
 
 ***REMOVED******REMOVED***  // Capture function calls by the ODEInt library for differentials and convert it to a custom form 
 ***REMOVED******REMOVED***  auto dFunctionWrapper = [dxBydt] (const VectorXd &x, VectorXd &dxdt, double t){
