@@ -54,9 +54,10 @@ int main(
 ***REMOVED*** cout<<"Program started..."<<endl;
 
 ***REMOVED*** // Variable declarations***REMOVED***
-***REMOVED*** RowVectorXd t_BC(4);***REMOVED***  // t_BC***REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
-***REMOVED*** VectorXd _0x_t1(6);***REMOVED******REMOVED***// _0x_t1***REMOVED******REMOVED***= column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
-***REMOVED*** BVPSolution bvpSolution; // bvpSolution = the structure in which the solutions of the boundary value problem will be saved
+***REMOVED*** RowVectorXd t_BC(4);***REMOVED******REMOVED******REMOVED*** // t_BC***REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
+***REMOVED*** VectorXd _0x_t1(6);***REMOVED******REMOVED******REMOVED***  // _0x_t1***REMOVED******REMOVED***= column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
+***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED***// bvpSolution = the structure in which the solutions of the boundary value problem will be saved
+***REMOVED*** IVAMParameters ivamParameters // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
 ***REMOVED*** // Variable assignments
 ***REMOVED*** t_BC***REMOVED***<< 0.0, 0.8, 1.4, 2;
@@ -65,12 +66,16 @@ int main(
 ***REMOVED******REMOVED******REMOVED******REMOVED***  0.00000,
 ***REMOVED******REMOVED******REMOVED******REMOVED***  0.28800,
 ***REMOVED******REMOVED******REMOVED******REMOVED***  0.00000,
-***REMOVED******REMOVED******REMOVED******REMOVED***  0.49883;
+***REMOVED******REMOVED******REMOVED******REMOVED***  0.49883;***REMOVED*** 
+***REMOVED*** ivamParameters.EPSILON = 1e-8;  // EPSILON = the state perturbation parameter to probe the differential equation system with
+***REMOVED*** ivamParameters.ALPHA***REMOVED***= 1;***REMOVED***  // ALPHA***REMOVED***= the relaxation factor to scale the adjustment to the initial condition
+***REMOVED*** ivamParameters.SIGMA***REMOVED***= 1e-14; // SIGMA***REMOVED***= the tolerance for error outside which the solver needs to  iterate further. 
+***REMOVED*** ivamParameters.BETA***REMOVED*** = 1e-3;  // BETA***REMOVED*** = the deflation factor
 
 ***REMOVED*** cout<<"Initiating the BVP solver..."<<endl;
 ***REMOVED*** 
 ***REMOVED*** // Solve the boundary value problem
-***REMOVED*** bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0x_t1, dxBydt, BCResidue);
+***REMOVED*** bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0x_t1, dxBydt, BCResidue, ivamParameters);
 
 ***REMOVED*** cout<<"Done solving the BVP..."<<endl;
 
