@@ -54,10 +54,10 @@ int main(
 ***REMOVED*** cout<<"Program started..."<<endl;
 
 ***REMOVED*** // Variable declarations***REMOVED***
-***REMOVED*** RowVectorXd t_BC(4);***REMOVED******REMOVED******REMOVED*** // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
-***REMOVED*** VectorXd _0_x_t1(6);***REMOVED******REMOVED******REMOVED*** // _0_x_t1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
-***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED***// bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
-***REMOVED*** IVAMParameters ivamParameters // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
+***REMOVED*** RowVectorXd t_BC(4);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
+***REMOVED*** VectorXd _0_x_t1(6);***REMOVED******REMOVED******REMOVED***  // _0_x_t1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
+***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
+***REMOVED*** IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
 ***REMOVED*** // Variable definitions
 ***REMOVED*** t_BC***REMOVED*** << 0.0, 0.8, 1.4, 2;
@@ -85,16 +85,16 @@ int main(
 ***REMOVED*** cout<<"Solution"<<endl;
 ***REMOVED*** cout<<"========"<<endl;
 ***REMOVED*** cout<<"t = ";
-***REMOVED*** cout<<t<<endl;
+***REMOVED*** cout<<bvpSolution.t<<endl;
 ***REMOVED*** cout<<endl;
 ***REMOVED*** cout<<"x = "<<endl;
-***REMOVED*** cout<<x<<endl;
+***REMOVED*** cout<<bvpSolution.x<<endl;
 ***REMOVED*** cout<<endl;***REMOVED*** 
 ***REMOVED*** cout<<"t_BC = ";
-***REMOVED*** cout<<t_BC<<endl;
+***REMOVED*** cout<<bvpSolution.t_BC<<endl;
 ***REMOVED*** cout<<endl;
 ***REMOVED*** cout<<"x_BC = "<<endl;
-***REMOVED*** cout<<x_BC<<endl;
+***REMOVED*** cout<<bvpSolution.x_BC<<endl;
 ***REMOVED*** cout<<endl;***REMOVED*** 
 
 ***REMOVED*** return 0;

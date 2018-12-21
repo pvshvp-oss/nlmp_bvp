@@ -4,7 +4,7 @@
 #include <Eigen/Eigen>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For the matrix and vector classes
 using namespace Eigen;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  //
 using RowVectorXd = Matrix<double, 1, Dynamic>; // For the convenience of declaring row vectors
-===============================
+// ===============================
 
 // ========================
 // Structure IVAMParameters
@@ -15,7 +15,7 @@ struct IVAMParameters{
 ***REMOVED*** double ALPHA;***REMOVED***// ALPHA***REMOVED***= the relaxation factor to scale the adjustment to the initial condition
 ***REMOVED*** double SIGMA;***REMOVED***// SIGMA***REMOVED***= the tolerance for error outside which the solver needs to  iterate further. 
 ***REMOVED*** double BETA;***REMOVED*** // BETA***REMOVED*** = the deflation factor
-}
+};
 // ========================
 
 // =====================
@@ -26,7 +26,7 @@ struct BVPSolution{
 ***REMOVED*** MatrixXd x;***REMOVED******REMOVED*** // x***REMOVED*** = state vectors at all grid points t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nxnGrid)  
 ***REMOVED*** RowVectorXd t_BC; // t_BC = row vector of boundary condition values at which state vectors x_BC are evaluated -- (1xm)***REMOVED***
 ***REMOVED*** MatrixXd x_BC;***REMOVED*** // x_BC = state vectors at boundary conditions t_BC***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nxm)
-}
+};
 // =====================
 
 // ===================
@@ -39,7 +39,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED*** RowVectorXd t_BC,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED*** VectorXd _0_x_t1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // _0_x_t1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)***REMOVED*** 
 ***REMOVED*** VectorXd dxBydt(double t, VectorXd x), // dxBydt***REMOVED******REMOVED******REMOVED***= a function that defines the derivative of a state vector x at t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
-***REMOVED*** VectorXd BCResidues(MatrixXd x_BC)***REMOVED***  // BCResidues***REMOVED***  = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
-***REMOVED*** const IVAMParameters ivamParameters***REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
+***REMOVED*** VectorXd BCResidues(MatrixXd x_BC),***REMOVED*** // BCResidues***REMOVED***  = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+***REMOVED*** IVAMParameters ivamParameters***REMOVED******REMOVED******REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 ***REMOVED*** );
 // ===================

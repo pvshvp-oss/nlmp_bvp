@@ -30,8 +30,8 @@ BVPSolution nlmp_bvp(
 ***REMOVED*** RowVectorXd t_BC,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED*** VectorXd _0_x_t1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // _0_x_t1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)***REMOVED*** 
 ***REMOVED*** VectorXd dxBydt(double t, VectorXd x), // dxBydt***REMOVED******REMOVED******REMOVED***= a function that defines the derivative of a state vector x at t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
-***REMOVED*** VectorXd BCResidues(MatrixXd x_BC)***REMOVED***  // BCResidues***REMOVED***  = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
-***REMOVED*** const IVAMParameters ivamParameters***REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
+***REMOVED*** VectorXd BCResidues(MatrixXd x_BC),***REMOVED*** // BCResidues***REMOVED***  = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+***REMOVED*** IVAMParameters ivamParameters***REMOVED******REMOVED******REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 ***REMOVED*** ){  
 
 ***REMOVED******REMOVED***  // Variable declarations***REMOVED******REMOVED***  
@@ -56,7 +56,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  VectorXd x_t1(n);***REMOVED******REMOVED******REMOVED***  // x_t1***REMOVED******REMOVED******REMOVED***= the computed initial state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 ***REMOVED******REMOVED***  VectorXd x_t1P(n);***REMOVED******REMOVED******REMOVED*** // x_t1P***REMOVED******REMOVED***  = the computed perturbed initial state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
 ***REMOVED******REMOVED***  VectorXd _k_g(n);***REMOVED******REMOVED******REMOVED***  // _k_g***REMOVED******REMOVED******REMOVED***= the boundary condition residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
-***REMOVED******REMOVED***  VectorXd _k_g_j(n)***REMOVED******REMOVED******REMOVED*** // _k_g_j***REMOVED******REMOVED*** = the j-th boundary condition perturbed system residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+***REMOVED******REMOVED***  VectorXd _k_g_j(n);***REMOVED******REMOVED******REMOVED***// _k_g_j***REMOVED******REMOVED*** = the j-th boundary condition perturbed system residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 ***REMOVED******REMOVED***  MatrixXd _k_S(n,n);***REMOVED******REMOVED******REMOVED***// _k_S***REMOVED******REMOVED******REMOVED***= the adjusting matrix for correcting the initial condition k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nxn) 
 ***REMOVED******REMOVED***  BVPSolution bvpSolution;
 
@@ -119,7 +119,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_g_j =  BCResidues(xSolP(Eigen::all, BCCols));
 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Compute a column of the adjusting matrix***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_S.col(j) = (BCResidues(getX_BCs(IVPPTSolutions, IVPPXSolutions))- gkX0)/kEpsilon;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation
@@ -138,7 +138,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  bvpSolution.t***REMOVED*** = tSol;
 ***REMOVED******REMOVED***  bvpSolution.x***REMOVED*** = xSol;
 ***REMOVED******REMOVED***  bvpSolution.t_BC = t_BC;
-***REMOVED******REMOVED***  bvpSolution.x_BC = xSol(Eigen::all, BCCols)
+***REMOVED******REMOVED***  bvpSolution.x_BC = xSol(Eigen::all, BCCols);
 ***REMOVED******REMOVED***  return bvpSolution;
 ***REMOVED*** }
 // ===================
