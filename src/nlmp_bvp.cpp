@@ -128,11 +128,13 @@ BVPSolution nlmp_bvp(
                 // Compute a column of the adjusting matrix                
                 _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;                
             }
+                        
+            _k_alpha = 1;
+            VectorXd xPrev = _k_x_t1;
+            VectorXd gPrev = _k_g;
 
-            VectorXd temp = _k_x_t1;
             // Solve the linarized adjusting equation
             _k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
-            cout<<"Difference = "<<endl<<_k_S*(_k_x_t1 - temp) + _k_alpha*_k_g<<endl;
             _k_GPrev = _k_G;
             ++k;
 
@@ -141,7 +143,15 @@ BVPSolution nlmp_bvp(
             iCol     = 0;       // Set the solution column index to 0 before the IVP solver starts integrating
             integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
             _k_g = BCResidues(xSol(Eigen::all, BCCols));
-            _k_G = _k_g.norm()/sqrt(n);            
+            _k_G = _k_g.norm()/sqrt(n);      
+
+            cout<<"dRes/dx = "<<endl<<_k_S<<endl;
+            cout<<"dx = "<<endl<<_k_x_t1 - xPrev<<endl;
+            cout<<"Res = "<<endl<<_k_g<<endl;
+
+            if(k >= 9){
+                break;
+            }
         }  
         bvpSolution.t    = tSol;
         bvpSolution.x    = xSol;
