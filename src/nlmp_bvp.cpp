@@ -10,23 +10,24 @@ using namespace Eigen;                          //
 using namespace boost::numeric::odeint;         //
 using RowVectorXi = Matrix<int, 1, Dynamic>;    // For the convenience of declaring row vectors
 using RowVectorXd = Matrix<double, 1, Dynamic>; // For the convenience of declaring row vectors
-const double EPSION = 1e-8;                     // EPSION = the state perturbation parameter to probe the differential equation system with
-const double ALPHA = 1;                         // ALPHA  = the relaxation factor to scale the adjustment to the initial condition
-const double SIGMA = 1e-14;                     // SIGMA  = the tolerance for error outside which the solver needs to  iterate further. 
-const double BETA = 1e-3;                       // BETA   = the deflation factor
+const double EPSILON = 1e-8;                    // EPSILON = the state perturbation parameter to probe the differential equation system with
+const double ALPHA = 1;                         // ALPHA   = the relaxation factor to scale the adjustment to the initial condition
+const double SIGMA = 1e-14;                     // SIGMA   = the tolerance for error outside which the solver needs to  iterate further. 
+const double BETA = 1e-3;                       // BETA    = the deflation factor
 // ===============================
 
 // ===================
 // Function "nlmp_bvp"
 // ===================
 BVPSolution nlmp_bvp(
-    int n,                                 // n         = the number of differential equations = the number of boundary conditions
-    int m,                                 // m         = the number of nodes at which boundary conditions are specified
-    int nGrid,                             // nGrid     = the number of points at which the state is evaluated
-    RowVectorXd t_BC,                      // t_BC      = row vector of values at which the boundary conditions are specified           -- (1xm)
-    VectorXd _0x_t1,                       // _0x_t1    = column vector of the guessed initial state                                    -- (nx1)    
-    VectorXd dxBydt(double t, VectorXd x), // dxBydt    = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXd BCResidue(MatrixXd x_BC)      // BCResidue = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+    int n,                                 // n              = the number of differential equations = the number of boundary conditions
+    int m,                                 // m              = the number of nodes at which boundary conditions are specified
+    int nGrid,                             // nGrid          = the number of points at which the state is evaluated
+    RowVectorXd t_BC,                      // t_BC           = row vector of values at which the boundary conditions are specified           -- (1xm)
+    VectorXd _0x_t1,                       // _0x_t1         = column vector of the guessed initial state                                    -- (nx1)    
+    VectorXd dxBydt(double t, VectorXd x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
+    VectorXd BCResidue(MatrixXd x_BC)      // BCResidue      = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+    const IVAMParameters ivamParameters    // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     ){  
         int m;
         int k = 0;     
