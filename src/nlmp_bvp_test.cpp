@@ -1,17 +1,18 @@
-// ========================
-// Includes and definitions
-// ========================
-#include<iostream>
-#include<nlmp_bvp.hpp>
-using namespace std;
-using namespace Eigen;
-using RowVectorXd = Matrix<double, 1, Dynamic>;
-// ========================
+// ===============================
+// Includes and global definitions
+// ===============================
+#include<iostream>                              // For the cout statements
+#include<nlmp_bvp.hpp>                          // For the function declarations
+using namespace std;                            //
+using namespace Eigen;                          //
+using RowVectorXd = Matrix<double, 1, Dynamic>; // For the convenience of declaring row vectors
+// ===============================
 
-// ===========================================================================
-// Functions that define the differential equation and its boundary conditions
-// ===========================================================================
-VectorXd dFunction(double t, VectorXd x){
+// ================
+// Functions dxBydt
+// ================
+// dxBydt = a function that defines the derivative of a state vector x at t -- (nx1)
+VectorXd dxBydt(double t, VectorXd x){ 
     VectorXd dxdt(6);
     double r = sqrt(pow(x(0),2) + pow(x(2),2) + pow(x(4),2));
     dxdt(0) = x(1);
@@ -22,7 +23,13 @@ VectorXd dFunction(double t, VectorXd x){
     dxdt(5) = -x(4) / pow(r,3);
     return dxdt;
 }
-VectorXd BCFunction(MatrixXd BC){
+// ================
+
+// ===================
+// Functions BCResidue
+// ===================
+// BCResidue = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+VectorXd BCResidue(MatrixXd BC){
     VectorXd residues(6);
     residues(0) = BC(0,0) - 1.076;
     residues(1) = BC(1,0) + pow(BC(1,0),2) + BC(1,1) + BC(1,2) + BC(1,3) + 2.053292953504164;
@@ -32,18 +39,59 @@ VectorXd BCFunction(MatrixXd BC){
     residues(5) = BC(5,3) + 0.03407297218269353;
     return residues;
 }
-// ============================================================================
+// ===================
 
 // =================
 // The main function
 // =================
-int main(int argc, char **argv)
-{
-    VectorXd startingState(6);
-    RowVectorXd tNodes(4);
-    tNodes << 0.0, 0.8, 1.4, 2;
-    startingState << 1.076, 0.538, 0.0, 0.288, 0.0, 0.49883;
-    nlmp_bvp(6, startingState, tNodes, dFunction, BCFunction);
+// This is where the program execution begins
+int main(
+    int argc,   // argc = the number of arguments passed to the program
+    char **argv // argv = an array of strings that are passed to  the program 
+    ){
+
+    cout<<endl;
+    cout<<"Program started..."<<endl;
+
+    // Variable declarations   
+    RowVectorXd t_BC(4);     // t_BC        = row vector of values at which the boundary conditions are specified -- (1xm)
+    VectorXd _0x_t1(6);      // _0x_t1      = column vector of the guessed initial state                          -- (nx1)
+    BVPSolution bvpSolution; // bvpSolution = the structure in which the solutions of the boundary value problem will be saved
+
+    // Variable assignments
+    t_BC   << 0.0, 0.8, 1.4, 2;
+    _0x_t1 << 1.07600,
+              0.53800,
+              0.00000,
+              0.28800,
+              0.00000,
+              0.49883;
+
+    cout<<"Initiating the BVP solver..."<<endl;
+    
+    // Solve the boundary value problem
+    bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0x_t1, dxBydt, BCResidue);
+
+    cout<<"Done solving the BVP..."<<endl;
+
+    // Print the output
+    cout<<endl;
+    cout<<"========"<<endl;
+    cout<<"Solution"<<endl;
+    cout<<"========"<<endl;
+    cout<<"t = ";
+    cout<<t<<endl;
+    cout<<endl;
+    cout<<"x = "<<endl;
+    cout<<x<<endl;
+    cout<<endl;    
+    cout<<"t_BC = ";
+    cout<<t_BC<<endl;
+    cout<<endl;
+    cout<<"x_BC = "<<endl;
+    cout<<x_BC<<endl;
+    cout<<endl;    
+
     return 0;
 }
 // =================
