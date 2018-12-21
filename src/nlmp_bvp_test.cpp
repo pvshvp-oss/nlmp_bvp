@@ -54,14 +54,14 @@ int main(
     cout<<"Program started..."<<endl;
 
     // Variable declarations   
-    RowVectorXd t_BC(4);          // t_BC        = row vector of values at which the boundary conditions are specified -- (1xm)
-    VectorXd _0x_t1(6);           // _0x_t1      = column vector of the guessed initial state                          -- (nx1)
-    BVPSolution bvpSolution;      // bvpSolution = the structure in which the solutions of the boundary value problem will be saved
+    RowVectorXd t_BC(4);          // t_BC           = row vector of values at which the boundary conditions are specified -- (1xm)
+    VectorXd _0_x_t1(6);          // _0_x_t1        = column vector of the guessed initial state                          -- (nx1)
+    BVPSolution bvpSolution;      // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters ivamParameters // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
-    // Variable assignments
-    t_BC   << 0.0, 0.8, 1.4, 2;
-    _0x_t1 << 1.07600,
+    // Variable definitions
+    t_BC    << 0.0, 0.8, 1.4, 2;
+    _0_x_t1 << 1.07600,
               0.53800,
               0.00000,
               0.28800,
@@ -75,7 +75,7 @@ int main(
     cout<<"Initiating the BVP solver..."<<endl;
     
     // Solve the boundary value problem
-    bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0x_t1, dxBydt, BCResidue, ivamParameters);
+    bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0_x_t1, dxBydt, BCResidue, ivamParameters);
 
     cout<<"Done solving the BVP..."<<endl;
 
