@@ -66,6 +66,8 @@ BVPSolution nlmp_bvp(
         h      = (tm - t0)/(nGrid-1);
         BCCols = ((t_BC-t0*RowVectorXd::Ones(m))/h).array().round().cast<int>();
 
+        cout<<"BCCols = "<<BCCols<<endl;
+
         // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
         auto dxBydtWrapper = [dxBydt] // Captured variables
                              (const VectorXd &x, VectorXd &dxdt, double t){
@@ -127,11 +129,10 @@ BVPSolution nlmp_bvp(
                 _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;                
             }
 
+            VectorXd temp = _k_x_t1;
             // Solve the linarized adjusting equation
             _k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
-
-            cout<<"det(S) = "<<_k_S.determinant();<<endl;
-
+            cout<<"Difference = "<<endl<<_k_S*(_k_x_t1 - temp) + _k_alpha*_k_g<<endl;
             _k_GPrev = _k_G;
             ++k;
 
