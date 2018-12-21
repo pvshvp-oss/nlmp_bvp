@@ -128,11 +128,13 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Compute a column of the adjusting matrix***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED***_k_alpha = 1;
+***REMOVED******REMOVED******REMOVED******REMOVED***VectorXd xPrev = _k_x_t1;
+***REMOVED******REMOVED******REMOVED******REMOVED***VectorXd gPrev = _k_g;
 
-***REMOVED******REMOVED******REMOVED******REMOVED***VectorXd temp = _k_x_t1;
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Difference = "<<endl<<_k_S*(_k_x_t1 - temp) + _k_alpha*_k_g<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_GPrev = _k_G;
 ***REMOVED******REMOVED******REMOVED******REMOVED***++k;
 
@@ -141,7 +143,15 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***iCol***REMOVED***  = 0;***REMOVED******REMOVED*** // Set the solution column index to 0 before the IVP solver starts integrating
 ***REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_g = BCResidues(xSol(Eigen::all, BCCols));
-***REMOVED******REMOVED******REMOVED******REMOVED***_k_G = _k_g.norm()/sqrt(n);***REMOVED******REMOVED******REMOVED******REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED***_k_G = _k_g.norm()/sqrt(n);***REMOVED******REMOVED***
+
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"dRes/dx = "<<endl<<_k_S<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"dx = "<<endl<<_k_x_t1 - xPrev<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Res = "<<endl<<_k_g<<endl;
+
+***REMOVED******REMOVED******REMOVED******REMOVED***if(k >= 9){
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;
+***REMOVED******REMOVED******REMOVED******REMOVED***}
 ***REMOVED******REMOVED***  }  
 ***REMOVED******REMOVED***  bvpSolution.t***REMOVED*** = tSol;
 ***REMOVED******REMOVED***  bvpSolution.x***REMOVED*** = xSol;
