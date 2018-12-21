@@ -62,15 +62,18 @@ int main(
 ***REMOVED*** // Variable definitions
 ***REMOVED*** t_BC***REMOVED*** << 0.0, 0.8, 1.4, 2;
 ***REMOVED*** _0_x_t1 << 1.07600,
-***REMOVED******REMOVED******REMOVED******REMOVED***  0.53800,
-***REMOVED******REMOVED******REMOVED******REMOVED***  0.00000,
-***REMOVED******REMOVED******REMOVED******REMOVED***  0.28800,
-***REMOVED******REMOVED******REMOVED******REMOVED***  0.00000,
-***REMOVED******REMOVED******REMOVED******REMOVED***  0.49883;***REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***0.53800,
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***0.00000,
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***0.28800,
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***0.00000,
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***0.49883;***REMOVED*** 
 ***REMOVED*** ivamParameters.EPSILON = 1e-8;  // EPSILON = the state perturbation parameter to probe the differential equation system with
 ***REMOVED*** ivamParameters.ALPHA***REMOVED***= 1.0;***REMOVED***// ALPHA***REMOVED***= the relaxation factor to scale the adjustment to the initial condition
 ***REMOVED*** ivamParameters.SIGMA***REMOVED***= 1e-14; // SIGMA***REMOVED***= the tolerance for error outside which the solver needs to  iterate further. 
 ***REMOVED*** ivamParameters.BETA***REMOVED*** = 1e-3;  // BETA***REMOVED*** = the deflation factor
+
+***REMOVED*** cout<<"t_BC = "<<t_BC<<endl;
+***REMOVED*** cout<<"_0_x_t1 = "<<endl<<_0_x_t1<<endl;
 
 ***REMOVED*** cout<<"Initiating the BVP solver..."<<endl;
 ***REMOVED*** 

@@ -34,7 +34,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED*** IVAMParameters ivamParameters***REMOVED******REMOVED******REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 ***REMOVED*** ){  
 
-***REMOVED******REMOVED***  // Variable declarations***REMOVED******REMOVED***  
+***REMOVED******REMOVED***  // Variable declarations***REMOVED***
 ***REMOVED******REMOVED***  int j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // j***REMOVED******REMOVED******REMOVED******REMOVED***= the inner iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,n-1]
 ***REMOVED******REMOVED***  int k;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // k***REMOVED******REMOVED******REMOVED******REMOVED***= the outer iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,Inf)
 ***REMOVED******REMOVED***  int iCol;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // iCol***REMOVED******REMOVED******REMOVED***= the column index of the x solution for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- [0,nGrid-1]
@@ -52,6 +52,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  MatrixXd xSolP(n,nGrid);***REMOVED*** // xSolP***REMOVED******REMOVED***  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED***-- (nxnGrid)
 ***REMOVED******REMOVED***  RowVectorXi BCCols(m);***REMOVED******REMOVED***// BCCols***REMOVED******REMOVED*** = the columns in the grid that correspond to boundary values***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED******REMOVED***  VectorXd _k_x_t1(n);***REMOVED******REMOVED***  // _k_x_t1***REMOVED******REMOVED***= the computed initial state vector in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
+***REMOVED******REMOVED***  VectorXd _k_x_t1Prev(n);***REMOVED*** // _k_x_t1Prev  = the computed initial state vector in the previous (k-1)-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
 ***REMOVED******REMOVED***  VectorXd _k_x_t1P(n);***REMOVED******REMOVED*** // _k_x_t1***REMOVED******REMOVED***= the computed perturbed initial state vector in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
 ***REMOVED******REMOVED***  VectorXd x_t1(n);***REMOVED******REMOVED******REMOVED***  // x_t1***REMOVED******REMOVED******REMOVED***= the computed initial state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 ***REMOVED******REMOVED***  VectorXd x_t1P(n);***REMOVED******REMOVED******REMOVED*** // x_t1P***REMOVED******REMOVED***  = the computed perturbed initial state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
@@ -90,10 +91,11 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***++iColP;***REMOVED******REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED***  };***REMOVED******REMOVED*** 
  
-***REMOVED******REMOVED***  _k_GPrev = INF;
-***REMOVED******REMOVED***  _k_alpha = ivamParameters.ALPHA;
-***REMOVED******REMOVED***  k***REMOVED******REMOVED***  = 0;***REMOVED******REMOVED*** // Set k for the first time
-***REMOVED******REMOVED***  _k_x_t1  = _0_x_t1; // Assign the initial condition state vector for the 0-th iteration
+***REMOVED******REMOVED***  _k_GPrev***REMOVED*** = INF;
+***REMOVED******REMOVED***  _k_alpha***REMOVED*** = ivamParameters.ALPHA;
+***REMOVED******REMOVED***  k***REMOVED******REMOVED******REMOVED***  = 0;***REMOVED******REMOVED*** // Set k for the first time
+***REMOVED******REMOVED***  _k_x_t1***REMOVED***  = _0_x_t1; // Assign the initial condition state vector for the 0-th iteration
+***REMOVED******REMOVED***  _k_x_t1Prev = _k_x_t1;
 
 ***REMOVED******REMOVED***  // Solve the initial value problem for the first time 
 ***REMOVED******REMOVED***  x_t1***REMOVED***  = _k_x_t1; // Assign the current initial condition state vector to a dummy variable
@@ -106,17 +108,19 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"k = "<<k<<"... _k_G = "<<_k_G<<"... _k_GPrev = "<<_k_GPrev<<endl;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***if(_k_G < 0.1*_k_GPrev) {
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"Going too fast. Changing alpha from "<<_k_alpha<<" to "<<fmin(1.2*_k_alpha, 1.0)<<"..."<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_alpha = fmin(1.2*_k_alpha, 1.0);***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Going too fast. Changing alpha from "<<_k_alpha<<" to "<<fmin(1.2*_k_alpha, 1.0)<<"..."<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  _k_alpha = fmin(1.2*_k_alpha, 1.0);***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***} else if(_k_G >= _k_GPrev){
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"Error increased. Changing alpha from "<<_k_alpha<<" to "<<0.8*_k_alpha<<"..."<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Error increased. Changing alpha from "<<_k_alpha<<" to "<<0.8*_k_alpha<<"..."<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_alpha = 0.8*_k_alpha;
-***REMOVED******REMOVED******REMOVED******REMOVED***}***REMOVED***  
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_x_t1 = _k_x_t1Prev;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** //skipInternalLoop = true;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED***}  
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(j = 0; j < n; j++){***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Determine the perturbation parameter
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_epsilon_j = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * _k_x_t1(j)));
 ***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Perturb the initial conditions***REMOVED******REMOVED******REMOVED******REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Perturb the initial conditions***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_x_t1P = _k_x_t1 + _k_epsilon_j*MatrixXd::Identity(n,n).col(j);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Solve the perturbed initial value problem***REMOVED***
@@ -128,13 +132,11 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Compute a column of the adjusting matrix***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED***_k_alpha = 1;
-***REMOVED******REMOVED******REMOVED******REMOVED***VectorXd xPrev = _k_x_t1;
-***REMOVED******REMOVED******REMOVED******REMOVED***VectorXd gPrev = _k_g;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation
-***REMOVED******REMOVED******REMOVED******REMOVED***_k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
+***REMOVED******REMOVED******REMOVED******REMOVED***_k_x_t1Prev = _k_x_t1; 
+***REMOVED******REMOVED******REMOVED******REMOVED***_k_x_t1 = _k_x_t1 - _k_S.colPivHouseholderQr().solve(_k_alpha*_k_g);
+***REMOVED******REMOVED******REMOVED******REMOVED***//_k_x_t1 = _k_x_t1 - _k_alpha * _k_S.fullPivLu().inverse() *_k_g;
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_GPrev = _k_G;
 ***REMOVED******REMOVED******REMOVED******REMOVED***++k;
 
@@ -143,15 +145,8 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***iCol***REMOVED***  = 0;***REMOVED******REMOVED*** // Set the solution column index to 0 before the IVP solver starts integrating
 ***REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_g = BCResidues(xSol(Eigen::all, BCCols));
-***REMOVED******REMOVED******REMOVED******REMOVED***_k_G = _k_g.norm()/sqrt(n);***REMOVED******REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED***_k_G = _k_g.norm()/sqrt(n);***REMOVED***
 
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"dRes/dx = "<<endl<<_k_S<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"dx = "<<endl<<_k_x_t1 - xPrev<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Res = "<<endl<<_k_g<<endl;
-
-***REMOVED******REMOVED******REMOVED******REMOVED***if(k >= 9){
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;
-***REMOVED******REMOVED******REMOVED******REMOVED***}
 ***REMOVED******REMOVED***  }  
 ***REMOVED******REMOVED***  bvpSolution.t***REMOVED*** = tSol;
 ***REMOVED******REMOVED***  bvpSolution.x***REMOVED*** = xSol;

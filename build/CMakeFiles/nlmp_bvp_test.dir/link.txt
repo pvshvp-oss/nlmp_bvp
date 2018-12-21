@@ -1,1 +1,0 @@
-/bin/g++  -g  -rdynamic CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp.cpp.o CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o  -o ../bin/nlmp_bvp_test 
