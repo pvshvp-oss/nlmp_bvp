@@ -39,7 +39,7 @@ BVPSolution nlmp_bvp(
     RowVectorXd t_BC,                      // t_BC           = row vector of values at which the boundary conditions are specified           -- (1xm)
     VectorXd _0_x_t1,                      // _0_x_t1        = column vector of the guessed initial state                                    -- (nx1)    
     VectorXd dxBydt(double t, VectorXd x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXd BCResidue(MatrixXd x_BC)      // BCResidue      = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+    VectorXd BCResidues(MatrixXd x_BC)     // BCResidues     = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
     const IVAMParameters ivamParameters    // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     );
 // ===================
