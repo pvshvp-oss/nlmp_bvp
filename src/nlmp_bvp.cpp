@@ -34,7 +34,7 @@ BVPSolution nlmp_bvp(
     IVAMParameters ivamParameters          // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     ){  
 
-        // Variable declarations        
+        // Variable declarations   
         int j;                      // j            = the inner iterating variable for IVAM                                                              -- [0,n-1]
         int k;                      // k            = the outer iterating variable for IVAM                                                              -- [0,Inf)
         int iCol;                   // iCol         = the column index of the x solution for the IVP solver                                              -- [0,nGrid-1]
@@ -52,6 +52,7 @@ BVPSolution nlmp_bvp(
         MatrixXd xSolP(n,nGrid);    // xSolP        = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
         RowVectorXi BCCols(m);      // BCCols       = the columns in the grid that correspond to boundary values                                         -- (1xm)
         VectorXd _k_x_t1(n);        // _k_x_t1      = the computed initial state vector in the k-th iteration                                            -- (nx1)
+        VectorXd _k_x_t1Prev(n);    // _k_x_t1Prev  = the computed initial state vector in the previous (k-1)-th iteration                               -- (nx1)
         VectorXd _k_x_t1P(n);       // _k_x_t1      = the computed perturbed initial state vector in the k-th iteration                                  -- (nx1)
         VectorXd x_t1(n);           // x_t1         = the computed initial state vector to be input to the IVP solver                                    -- (nx1)
         VectorXd x_t1P(n);          // x_t1P        = the computed perturbed initial state vector to be input to the IVP solver                          -- (nx1)
@@ -90,10 +91,11 @@ BVPSolution nlmp_bvp(
             ++iColP;            
         };       
  
-        _k_GPrev = INF;
-        _k_alpha = ivamParameters.ALPHA;
-        k        = 0;       // Set k for the first time
-        _k_x_t1  = _0_x_t1; // Assign the initial condition state vector for the 0-th iteration
+        _k_GPrev    = INF;
+        _k_alpha    = ivamParameters.ALPHA;
+        k           = 0;       // Set k for the first time
+        _k_x_t1     = _0_x_t1; // Assign the initial condition state vector for the 0-th iteration
+        _k_x_t1Prev = _k_x_t1;
 
         // Solve the initial value problem for the first time 
         x_t1     = _k_x_t1; // Assign the current initial condition state vector to a dummy variable
@@ -106,17 +108,19 @@ BVPSolution nlmp_bvp(
             cout<<"k = "<<k<<"... _k_G = "<<_k_G<<"... _k_GPrev = "<<_k_GPrev<<endl;
 
             if(_k_G < 0.1*_k_GPrev) {
-                cout<<"Going too fast. Changing alpha from "<<_k_alpha<<" to "<<fmin(1.2*_k_alpha, 1.0)<<"..."<<endl;
-                _k_alpha = fmin(1.2*_k_alpha, 1.0);                
+                // cout<<"Going too fast. Changing alpha from "<<_k_alpha<<" to "<<fmin(1.2*_k_alpha, 1.0)<<"..."<<endl;
+                 _k_alpha = fmin(1.2*_k_alpha, 1.0);                
             } else if(_k_G >= _k_GPrev){
-                cout<<"Error increased. Changing alpha from "<<_k_alpha<<" to "<<0.8*_k_alpha<<"..."<<endl;
+                // cout<<"Error increased. Changing alpha from "<<_k_alpha<<" to "<<0.8*_k_alpha<<"..."<<endl;
                 _k_alpha = 0.8*_k_alpha;
-            }     
+                _k_x_t1 = _k_x_t1Prev;
+                //skipInternalLoop = true;                
+            }  
             for(j = 0; j < n; j++){   
                 // Determine the perturbation parameter
                 _k_epsilon_j = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * _k_x_t1(j)));
             
-                // Perturb the initial conditions            
+                // Perturb the initial conditions   
                 _k_x_t1P = _k_x_t1 + _k_epsilon_j*MatrixXd::Identity(n,n).col(j);
                 
                 // Solve the perturbed initial value problem   
@@ -128,13 +132,11 @@ BVPSolution nlmp_bvp(
                 // Compute a column of the adjusting matrix                
                 _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;                
             }
-                        
-            _k_alpha = 1;
-            VectorXd xPrev = _k_x_t1;
-            VectorXd gPrev = _k_g;
 
             // Solve the linarized adjusting equation
-            _k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
+            _k_x_t1Prev = _k_x_t1; 
+            _k_x_t1 = _k_x_t1 - _k_S.colPivHouseholderQr().solve(_k_alpha*_k_g);
+            //_k_x_t1 = _k_x_t1 - _k_alpha * _k_S.fullPivLu().inverse() *_k_g;
             _k_GPrev = _k_G;
             ++k;
 
@@ -143,15 +145,8 @@ BVPSolution nlmp_bvp(
             iCol     = 0;       // Set the solution column index to 0 before the IVP solver starts integrating
             integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
             _k_g = BCResidues(xSol(Eigen::all, BCCols));
-            _k_G = _k_g.norm()/sqrt(n);      
+            _k_G = _k_g.norm()/sqrt(n);   
 
-            cout<<"dRes/dx = "<<endl<<_k_S<<endl;
-            cout<<"dx = "<<endl<<_k_x_t1 - xPrev<<endl;
-            cout<<"Res = "<<endl<<_k_g<<endl;
-
-            if(k >= 9){
-                break;
-            }
         }  
         bvpSolution.t    = tSol;
         bvpSolution.x    = xSol;

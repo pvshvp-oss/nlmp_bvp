@@ -62,15 +62,18 @@ int main(
     // Variable definitions
     t_BC    << 0.0, 0.8, 1.4, 2;
     _0_x_t1 << 1.07600,
-              0.53800,
-              0.00000,
-              0.28800,
-              0.00000,
-              0.49883;    
+               0.53800,
+               0.00000,
+               0.28800,
+               0.00000,
+               0.49883;    
     ivamParameters.EPSILON = 1e-8;  // EPSILON = the state perturbation parameter to probe the differential equation system with
     ivamParameters.ALPHA   = 1.0;   // ALPHA   = the relaxation factor to scale the adjustment to the initial condition
     ivamParameters.SIGMA   = 1e-14; // SIGMA   = the tolerance for error outside which the solver needs to  iterate further. 
     ivamParameters.BETA    = 1e-3;  // BETA    = the deflation factor
+
+    cout<<"t_BC = "<<t_BC<<endl;
+    cout<<"_0_x_t1 = "<<endl<<_0_x_t1<<endl;
 
     cout<<"Initiating the BVP solver..."<<endl;
     
