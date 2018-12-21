@@ -60,10 +60,10 @@ BVPSolution nlmp_bvp(
         MatrixXd _k_S(n,n);         // _k_S         = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
         BVPSolution bvpSolution;
 
-        // Variable definitions        
-        h      = (tm - t0)/(nGrid-1);
+        // Variable definitions
         t0     = t_BC(0);
         tm     = t_BC(m-1);
+        h      = (tm - t0)/(nGrid-1);
         BCCols = ((t_BC-t0*RowVectorXd::Ones(m))/h).array().round().cast<int>();
 
         // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
@@ -99,10 +99,15 @@ BVPSolution nlmp_bvp(
         integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
         _k_g = BCResidues(xSol(Eigen::all, BCCols));
         _k_G = _k_g.norm()/sqrt(n);
-        while(_k_G > ivamParameters.SIGMA){  
+        while(_k_G > ivamParameters.SIGMA){ 
+
+            cout<<"k = "<<k<<"... _k_G = "<<_k_G<<"... _k_GPrev = "<<_k_GPrev<<endl;
+
             if(_k_G < 0.1*_k_GPrev) {
+                cout<<"Going too fast. Changing alpha from "<<_k_alpha<<" to "<<fmin(1.2*_k_alpha, 1.0)<<"..."<<endl;
                 _k_alpha = fmin(1.2*_k_alpha, 1.0);                
             } else if(_k_G >= _k_GPrev){
+                cout<<"Error increased. Changing alpha from "<<_k_alpha<<" to "<<0.8*_k_alpha<<"..."<<endl;
                 _k_alpha = 0.8*_k_alpha;
             }     
             for(j = 0; j < n; j++){   
@@ -124,6 +129,8 @@ BVPSolution nlmp_bvp(
 
             // Solve the linarized adjusting equation
             _k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
+
+            cout<<"det(S) = "<<_k_S.determinant();<<endl;
 
             _k_GPrev = _k_G;
             ++k;

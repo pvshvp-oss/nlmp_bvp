@@ -68,14 +68,14 @@ int main(
               0.00000,
               0.49883;    
     ivamParameters.EPSILON = 1e-8;  // EPSILON = the state perturbation parameter to probe the differential equation system with
-    ivamParameters.ALPHA   = 1;     // ALPHA   = the relaxation factor to scale the adjustment to the initial condition
+    ivamParameters.ALPHA   = 1.0;   // ALPHA   = the relaxation factor to scale the adjustment to the initial condition
     ivamParameters.SIGMA   = 1e-14; // SIGMA   = the tolerance for error outside which the solver needs to  iterate further. 
     ivamParameters.BETA    = 1e-3;  // BETA    = the deflation factor
 
     cout<<"Initiating the BVP solver..."<<endl;
     
     // Solve the boundary value problem
-    bvpSolution = nlmp_bvp(6, 4, 500, t_BC, _0_x_t1, dxBydt, BCResidues, ivamParameters);
+    bvpSolution = nlmp_bvp(6, 4, 501, t_BC, _0_x_t1, dxBydt, BCResidues, ivamParameters);
 
     cout<<"Done solving the BVP..."<<endl;
 
