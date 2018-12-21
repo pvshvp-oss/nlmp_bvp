@@ -60,10 +60,10 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  MatrixXd _k_S(n,n);***REMOVED******REMOVED******REMOVED***// _k_S***REMOVED******REMOVED******REMOVED***= the adjusting matrix for correcting the initial condition k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nxn) 
 ***REMOVED******REMOVED***  BVPSolution bvpSolution;
 
-***REMOVED******REMOVED***  // Variable definitions***REMOVED******REMOVED***  
-***REMOVED******REMOVED***  h***REMOVED******REMOVED***= (tm - t0)/(nGrid-1);
+***REMOVED******REMOVED***  // Variable definitions
 ***REMOVED******REMOVED***  t0***REMOVED***  = t_BC(0);
 ***REMOVED******REMOVED***  tm***REMOVED***  = t_BC(m-1);
+***REMOVED******REMOVED***  h***REMOVED******REMOVED***= (tm - t0)/(nGrid-1);
 ***REMOVED******REMOVED***  BCCols = ((t_BC-t0*RowVectorXd::Ones(m))/h).array().round().cast<int>();
 
 ***REMOVED******REMOVED***  // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
@@ -99,10 +99,15 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
 ***REMOVED******REMOVED***  _k_g = BCResidues(xSol(Eigen::all, BCCols));
 ***REMOVED******REMOVED***  _k_G = _k_g.norm()/sqrt(n);
-***REMOVED******REMOVED***  while(_k_G > ivamParameters.SIGMA){  
+***REMOVED******REMOVED***  while(_k_G > ivamParameters.SIGMA){ 
+
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"k = "<<k<<"... _k_G = "<<_k_G<<"... _k_GPrev = "<<_k_GPrev<<endl;
+
 ***REMOVED******REMOVED******REMOVED******REMOVED***if(_k_G < 0.1*_k_GPrev) {
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"Going too fast. Changing alpha from "<<_k_alpha<<" to "<<fmin(1.2*_k_alpha, 1.0)<<"..."<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_alpha = fmin(1.2*_k_alpha, 1.0);***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***} else if(_k_G >= _k_GPrev){
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"Error increased. Changing alpha from "<<_k_alpha<<" to "<<0.8*_k_alpha<<"..."<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** _k_alpha = 0.8*_k_alpha;
 ***REMOVED******REMOVED******REMOVED******REMOVED***}***REMOVED***  
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(j = 0; j < n; j++){***REMOVED***
@@ -124,6 +129,8 @@ BVPSolution nlmp_bvp(
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_x_t1 = _k_S.colPivHouseholderQr().solve(-_k_alpha*_k_g) + _k_x_t1;
+
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"det(S) = "<<_k_S.determinant();<<endl;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***_k_GPrev = _k_G;
 ***REMOVED******REMOVED******REMOVED******REMOVED***++k;
