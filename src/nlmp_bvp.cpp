@@ -30,8 +30,8 @@ BVPSolution nlmp_bvp(
     RowVectorXd t_BC,                      // t_BC           = row vector of values at which the boundary conditions are specified           -- (1xm)
     VectorXd _0_x_t1,                      // _0_x_t1        = column vector of the guessed initial state                                    -- (nx1)    
     VectorXd dxBydt(double t, VectorXd x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXd BCResidues(MatrixXd x_BC)     // BCResidues     = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
-    const IVAMParameters ivamParameters    // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
+    VectorXd BCResidues(MatrixXd x_BC),    // BCResidues     = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+    IVAMParameters ivamParameters          // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     ){  
 
         // Variable declarations        
@@ -56,7 +56,7 @@ BVPSolution nlmp_bvp(
         VectorXd x_t1(n);           // x_t1         = the computed initial state vector to be input to the IVP solver                                    -- (nx1)
         VectorXd x_t1P(n);          // x_t1P        = the computed perturbed initial state vector to be input to the IVP solver                          -- (nx1)
         VectorXd _k_g(n);           // _k_g         = the boundary condition residues in the k-th iteration                                              -- (nx1)
-        VectorXd _k_g_j(n)          // _k_g_j       = the j-th boundary condition perturbed system residues in the k-th iteration                        -- (nx1)
+        VectorXd _k_g_j(n);         // _k_g_j       = the j-th boundary condition perturbed system residues in the k-th iteration                        -- (nx1)
         MatrixXd _k_S(n,n);         // _k_S         = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
         BVPSolution bvpSolution;
 
@@ -119,7 +119,7 @@ BVPSolution nlmp_bvp(
                 _k_g_j =  BCResidues(xSolP(Eigen::all, BCCols));
 
                 // Compute a column of the adjusting matrix                
-                _k_S.col(j) = (BCResidues(getX_BCs(IVPPTSolutions, IVPPXSolutions))- gkX0)/kEpsilon;                
+                _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;                
             }
 
             // Solve the linarized adjusting equation
@@ -138,7 +138,7 @@ BVPSolution nlmp_bvp(
         bvpSolution.t    = tSol;
         bvpSolution.x    = xSol;
         bvpSolution.t_BC = t_BC;
-        bvpSolution.x_BC = xSol(Eigen::all, BCCols)
+        bvpSolution.x_BC = xSol(Eigen::all, BCCols);
         return bvpSolution;
     }
 // ===================

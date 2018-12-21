@@ -4,7 +4,7 @@
 #include <Eigen/Eigen>                          // For the matrix and vector classes
 using namespace Eigen;                          //
 using RowVectorXd = Matrix<double, 1, Dynamic>; // For the convenience of declaring row vectors
-===============================
+// ===============================
 
 // ========================
 // Structure IVAMParameters
@@ -15,7 +15,7 @@ struct IVAMParameters{
     double ALPHA;   // ALPHA   = the relaxation factor to scale the adjustment to the initial condition
     double SIGMA;   // SIGMA   = the tolerance for error outside which the solver needs to  iterate further. 
     double BETA;    // BETA    = the deflation factor
-}
+};
 // ========================
 
 // =====================
@@ -26,7 +26,7 @@ struct BVPSolution{
     MatrixXd x;       // x    = state vectors at all grid points t                                                -- (nxnGrid)  
     RowVectorXd t_BC; // t_BC = row vector of boundary condition values at which state vectors x_BC are evaluated -- (1xm)   
     MatrixXd x_BC;    // x_BC = state vectors at boundary conditions t_BC                                         -- (nxm)
-}
+};
 // =====================
 
 // ===================
@@ -39,7 +39,7 @@ BVPSolution nlmp_bvp(
     RowVectorXd t_BC,                      // t_BC           = row vector of values at which the boundary conditions are specified           -- (1xm)
     VectorXd _0_x_t1,                      // _0_x_t1        = column vector of the guessed initial state                                    -- (nx1)    
     VectorXd dxBydt(double t, VectorXd x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXd BCResidues(MatrixXd x_BC)     // BCResidues     = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
-    const IVAMParameters ivamParameters    // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
+    VectorXd BCResidues(MatrixXd x_BC),    // BCResidues     = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+    IVAMParameters ivamParameters          // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     );
 // ===================
