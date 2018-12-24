@@ -3,6 +3,19 @@
 // Email : shivanandvp.oss@gmail.com
 // ========================================
 
+// ============================
+// Credits for example problems
+// ============================
+/* Boundary Value Problem 1 */
+// "Using Initial Guess to Indicate Desired Solution"
+// “bvp4c.” Mathworks Documentation, Mathworks, www.mathworks.com/help/matlab/ref/bvp4c.html
+
+/* Boundary value problem 2 */
+// Example 2
+// Tr, Ramesh. (2017). A novel method for solving multipoint boundary value problems.
+// Global Journal of Pure and Applied Mathematics. 13. 850-857. 
+// ============================
+
 // ===============================
 // Includes and global definitions
 // ===============================
@@ -24,16 +37,16 @@ using RowVectorXm = Matrix<mpreal, 1, Dynamic>;***REMOVED******REMOVED*** // Dyn
 // dxBydt = a function that defines the derivative of a state vector x at t -- (nx1)
 VectorXm dxBydt(mpreal t, VectorXm x){ 
 
-***REMOVED*** // Boundary Value Problem 1
-***REMOVED*** // VectorXm dxdt(2);
-***REMOVED*** // dxdt(0) = x(1);
-***REMOVED*** // dxdt(1) = -fabs(x(0));
-
-***REMOVED*** // Boundary Value Problem 2
-***REMOVED*** VectorXm dxdt(3);
+***REMOVED*** /* Boundary Value Problem 1 */
+***REMOVED*** VectorXm dxdt(2);
 ***REMOVED*** dxdt(0) = x(1);
-***REMOVED*** dxdt(1) = x(2);
-***REMOVED*** dxdt(2) = 25*x(1) - 1;
+***REMOVED*** dxdt(1) = -fabs(x(0));
+
+***REMOVED*** /* Boundary Value Problem 2 */
+***REMOVED*** // VectorXm dxdt(3);
+***REMOVED*** // dxdt(0) = x(1);
+***REMOVED*** // dxdt(1) = x(2);
+***REMOVED*** // dxdt(2) = 25*x(1) - 1;
 
 ***REMOVED*** return dxdt;
 }
@@ -45,15 +58,15 @@ VectorXm dxBydt(mpreal t, VectorXm x){
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
 VectorXm BCResidues(MatrixXm xBC){
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** // VectorXm residues(2);
-***REMOVED*** // residues(0) = xBC(0,0) - 0;
-***REMOVED*** // residues(1) = xBC(0,1) + 2;
+***REMOVED*** VectorXm residues(2);
+***REMOVED*** residues(0) = xBC(0,0) - 0;
+***REMOVED*** residues(1) = xBC(0,1) + 2;
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** VectorXm residues(3);
-***REMOVED*** residues(0) = xBC(1,0) - 0;
-***REMOVED*** residues(1) = xBC(1,2) - 0;
-***REMOVED*** residues(2) = xBC(0,1) - 0;
+***REMOVED*** // VectorXm residues(3);
+***REMOVED*** // residues(0) = xBC(1,0) - 0;
+***REMOVED*** // residues(1) = xBC(1,2) - 0;
+***REMOVED*** // residues(2) = xBC(0,1) - 0;
 
 ***REMOVED*** return residues;
 }
@@ -79,30 +92,31 @@ int main(
 ***REMOVED*** // Variable declarations***REMOVED***
 
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** // RowVectorXm tBC(2);***REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
-***REMOVED*** // VectorXm oxt1(2);***REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+***REMOVED*** RowVectorXm tBC(2);***REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
+***REMOVED*** VectorXm oxt1(2);***REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** RowVectorXm  tBC(3);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
-***REMOVED*** VectorXm***REMOVED*** oxt1(3);***REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+***REMOVED*** // RowVectorXm  tBC(3);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
+***REMOVED*** // VectorXm***REMOVED*** oxt1(3);***REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+
 ***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
 ***REMOVED*** // Variable definitions
 
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** // tBC  << 0.0, 4.0;***REMOVED******REMOVED******REMOVED******REMOVED***// tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-***REMOVED*** // oxt1 << -1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1) 
-***REMOVED*** //***REMOVED******REMOVED******REMOVED*** 0;  
-***REMOVED*** // tBC  << 0.0, 4.0;***REMOVED******REMOVED******REMOVED******REMOVED***// tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-***REMOVED*** // oxt1 << -1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1) 
+***REMOVED*** tBC  << 0.0, 4.0;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+***REMOVED*** oxt1 <<  1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1) 
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0;  
+***REMOVED*** // tBC  << 0.0, 4.0;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+***REMOVED*** // oxt1 << -1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1) 
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED*** 0;
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** tBC  << 0.0, 0.5, 1.0;***REMOVED******REMOVED******REMOVED*** // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-***REMOVED*** oxt1 << 1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
-***REMOVED******REMOVED******REMOVED******REMOVED***1,
-***REMOVED******REMOVED******REMOVED******REMOVED***1;
+***REMOVED*** // tBC  << 0.0, 0.5, 1.0;***REMOVED******REMOVED******REMOVED*** // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+***REMOVED*** // oxt1 << 1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
+***REMOVED*** //***REMOVED******REMOVED******REMOVED***1,
+***REMOVED*** //***REMOVED******REMOVED******REMOVED***1;
 ***REMOVED***
 ***REMOVED*** // Assign the parameters for IVAM
 ***REMOVED*** ivamParameters.EPSILON = 1e-10; // EPSILON = the state perturbation parameter to probe the differential equation system with
@@ -118,10 +132,10 @@ int main(
 ***REMOVED*** // Solve the boundary value problem
 
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** // bvpSolution = nlmp_bvp(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+***REMOVED*** bvpSolution = nlmp_bvp(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** bvpSolution = nlmp_bvp(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+***REMOVED*** // bvpSolution = nlmp_bvp(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** cout<<endl<<"Done solving the BVP..."<<endl;
 
