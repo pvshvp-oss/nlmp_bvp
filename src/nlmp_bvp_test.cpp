@@ -1,18 +1,21 @@
-// Author: Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
+// ========================================
+// Author: Shivanand Pattanshetti 
+// Email : shivanand.pattanshetti@gmail.com
+// ========================================
 
 // ===============================
 // Includes and global definitions
 // ===============================
-#include<iostream>                              // For the cout statements
-#include<cmath>
-#include<nlmp_bvp.hpp>                          // For the function declarations
-#include <Eigen/MPRealSupport>
-using namespace mpfr;
-using namespace std;                            //
-using namespace Eigen;  
-using MatrixXm = Matrix<mpreal, Dynamic, Dynamic>;                        //
-using VectorXm = Matrix<mpreal, Dynamic, 1>;
-using RowVectorXm = Matrix<mpreal, 1, Dynamic>; // For the convenience of declaring row vectors
+#include<iostream>                                    // For the cout statements
+#include<cmath>                                       // For the math functions
+#include<Eigen/MPRealSupport>                         // For arbitrary precision computation
+#include<nlmp_bvp.hpp>                                // For the boundary value problem solver function declarations
+using namespace mpfr;                                 // For arbitrary precision computation
+using namespace std;                                  // For cout
+using namespace Eigen;                                // For matrix and vector data types and operations
+using MatrixXm    = Matrix<mpreal, Dynamic, Dynamic>; // Dynamic size matrix with the 'mpreal' data-type
+using VectorXm    = Matrix<mpreal, Dynamic, 1>;       // Dynamic size vector with the 'mpreal' data-type
+using RowVectorXm = Matrix<mpreal, 1, Dynamic>;       // Dynamic size row vector with the 'mpreal' data-type
 // ===============================
 
 // ================
@@ -20,19 +23,13 @@ using RowVectorXm = Matrix<mpreal, 1, Dynamic>; // For the convenience of declar
 // ================
 // dxBydt = a function that defines the derivative of a state vector x at t -- (nx1)
 VectorXm dxBydt(mpreal t, VectorXm x){ 
-    // VectorXm dxdt(6);
-    // mpreal r = sqrt(pow(x(0),2) + pow(x(2),2) + pow(x(4),2));
-    // dxdt(0) = x(1);
-    // dxdt(1) = -x(0) / pow(r,3);
-    // dxdt(2) = x(3);
-    // dxdt(3) = -x(2) / pow(r,3);
-    // dxdt(4) = x(5);
-    // dxdt(5) = -x(4) / pow(r,3);
 
+    // Boundary Value Problem 1
     // VectorXm dxdt(2);
     // dxdt(0) = x(1);
     // dxdt(1) = -fabs(x(0));
 
+    // Boundary Value Problem 2
     VectorXm dxdt(3);
     dxdt(0) = x(1);
     dxdt(1) = x(2);
@@ -47,18 +44,12 @@ VectorXm dxBydt(mpreal t, VectorXm x){
 // ====================
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
 VectorXm BCResidues(MatrixXm xBC){
-    // VectorXm residues(6);
-    // residues(0) = xBC(0,0) - 1.076;
-    // residues(1) = xBC(1,0) + pow(xBC(1,0),2) + xBC(1,1) + xBC(1,2) + xBC(1,3) + 2.053292953504164;
-    // residues(2) = xBC(2,0) + xBC(3,0) - 0.472283099142472;
-    // residues(3) = pow(xBC(3,1),2) + xBC(4,2) - 1.040204804411078;
-    // residues(4) = xBC(2,3) + xBC(4,3) - 1.57661; 
-    // residues(5) = xBC(5,3) + 0.03407297218269353;
-
+    /* Boundary Value Problem 1 */
     // VectorXm residues(2);
     // residues(0) = xBC(0,0) - 0;
     // residues(1) = xBC(0,1) + 2;
 
+    /* Boundary Value Problem 2 */
     VectorXm residues(3);
     residues(0) = xBC(1,0) - 0;
     residues(1) = xBC(1,2) - 0;
@@ -77,93 +68,81 @@ int main(
     char **argv // argv = an array of strings that are passed to  the program 
     ){
 
-    mpreal::set_default_prec(256);
+    mpreal::set_default_prec(256); // Set the number of digits of precision you want for computations
 
     cout<<endl;
-    cout<<"Program started..."<<endl;
+    cout<<"===================================================================="<<endl;
+    cout<<"Test: Non-linear multipoint boundary value problem solver (nlmp_bvp)"<<endl;
+    cout<<"===================================================================="<<endl;
+    cout<<"Copyright Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)"<<endl;
 
     // Variable declarations   
-    // RowVectorXm tBC(4);           // t_BC           = row vector of values at which the boundary conditions are specified -- (1xm)
-    // VectorXm oxt1(6);              // oxt1        = column vector of the guessed initial state                          -- (nx1)
-    // VectorXm oxt1(2);
-    // RowVectorXm tBC(2);
-    VectorXm oxt1(3);
-    RowVectorXm tBC(3);
+
+    /* Boundary Value Problem 1 */
+    // RowVectorXm tBC(2);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    // VectorXm oxt1(2);           // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+
+    /* Boundary Value Problem 2 */
+    RowVectorXm  tBC(3);           // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    VectorXm    oxt1(3);           // oxt1           = column vector of the guessed initial state                                       -- (nx1)
     BVPSolution bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
     // Variable definitions
-    // tBC    << 0.0, 0.8, 1.4, 2;
-    // oxt1 << 1.07600,
-    //            0.53800,
-    //            0.00000,
-    //            0.28800,
-    //            0.00000,
-    //            0.49883;  
-    // oxt1<< -1,
-    //         0;  
-    // tBC << 0.0, 4.0;
-    // oxt1<< -1,
-    //        0;
-    tBC << 0.0, 0.5, 1.0;
-    oxt1 << 1,
+
+    /* Boundary Value Problem 1 */
+    // tBC  << 0.0, 4.0;            // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    // oxt1 << -1,                  // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
+    //          0;  
+    // tBC  << 0.0, 4.0;            // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    // oxt1 << -1,                  // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
+    //          0;
+
+    /* Boundary Value Problem 2 */
+    tBC  << 0.0, 0.5, 1.0;          // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    oxt1 << 1,                      // oxt1 = column vector of the guessed initial state                                        -- (nx1)
             1,
             1;
    
+    // Assign the parameters for IVAM
     ivamParameters.EPSILON = 1e-10; // EPSILON = the state perturbation parameter to probe the differential equation system with
     ivamParameters.ALPHA   = 1.0;   // ALPHA   = the relaxation factor to scale the adjustment to the initial condition
     ivamParameters.SIGMA   = 1e-14; // SIGMA   = the tolerance for error outside which the solver needs to  iterate further. 
     ivamParameters.BETA    = 1e-3;  // BETA    = the deflation factor
 
-    cout<<"tBC = "<<tBC<<endl;
-    cout<<"oxt1 = "<<endl<<oxt1<<endl;
+    cout<<endl<<"Boundary nodes (tBC) = "<<endl<<tBC<<endl;
+    cout<<endl<<"Starting state vector (oxt1) = "<<endl<<oxt1<<endl;
 
-    cout<<"Initiating the BVP solver..."<<endl;
+    cout<<endl<<"Initiating the BVP solver..."<<endl<<endl;
     
     // Solve the boundary value problem
-    // bvpSolution = nlmp_bvp(6, 4, 501, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+
+    /* Boundary Value Problem 1 */
+    // bvpSolution = nlmp_bvp(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+
+    /* Boundary Value Problem 2 */
     bvpSolution = nlmp_bvp(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
-    cout<<"Done solving the BVP..."<<endl;
+    cout<<endl<<"Done solving the BVP..."<<endl;
 
     // Print the output
     cout<<endl;
     cout<<"========"<<endl;
     cout<<"Solution"<<endl;
     cout<<"========"<<endl;
-    cout<<"t = ";
-    cout<<bvpSolution.t<<endl;
+    cout<<"Independent variable (t) = ";
+    cout<<endl<<bvpSolution.t<<endl;
     cout<<endl;
-    cout<<"x = "<<endl;
+    cout<<"State vector (x) = "<<endl;
     cout<<bvpSolution.x<<endl;
     cout<<endl;    
-    cout<<"tBC = ";
+    cout<<"Independent variable at boundary nodes (tBC) = ";
     cout<<bvpSolution.tBC<<endl;
     cout<<endl;
-    cout<<"xBC = "<<endl;
+    cout<<"State vector at boundary nodes (xBC) = "<<endl;
     cout<<bvpSolution.xBC<<endl;
     cout<<endl;    
 
     return 0;
 }
 // =================
-
-// #include <iostream>
-// #include <Eigen/MPRealSupport>
-// #include <Eigen/LU>
-// using namespace mpfr;
-// using namespace Eigen;
-// int main()
-// {
-//   // set precision to 256 bits (double has only 53 bits)
-//   mpreal::set_default_prec(256);
-//   // Declare matrix and vector types with multi-precision scalar type
-//   typedef Matrix<mpreal,Dynamic,Dynamic>  MatrixXmp;
-//   typedef Matrix<mpreal,Dynamic,1>        VectorXmp;
-//   MatrixXmp A = MatrixXmp::Random(100,100);
-//   VectorXmp b = VectorXmp::Random(100);
-//   // Solve Ax=b using LU
-//   VectorXmp x = A.lu().solve(b);
-//   std::cout << "relative error: " << (A*x - b).norm() / b.norm() << std::endl;
-//   return 0;
-// }
