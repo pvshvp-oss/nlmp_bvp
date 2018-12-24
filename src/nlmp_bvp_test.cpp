@@ -85,7 +85,7 @@ int main(
 ***REMOVED*** // oxt1<< -1,
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED***0;  
 ***REMOVED*** tBC << 0.0, 4.0;
-***REMOVED*** oxt1<< 1,
+***REMOVED*** oxt1<< -1,
 ***REMOVED******REMOVED******REMOVED***  0;
 ***REMOVED***
 ***REMOVED*** ivamParameters.EPSILON = 1e-10; // EPSILON = the state perturbation parameter to probe the differential equation system with
