@@ -6,7 +6,11 @@
 ***REMOVED******REMOVED***  {
 ***REMOVED******REMOVED******REMOVED******REMOVED***"label": "echo",
 ***REMOVED******REMOVED******REMOVED******REMOVED***"type": "shell",
-***REMOVED******REMOVED******REMOVED******REMOVED***"command": "echo Hello"
+***REMOVED******REMOVED******REMOVED******REMOVED***"command": "echo Hello",
+***REMOVED******REMOVED******REMOVED******REMOVED***"group": {
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** "kind": "build",
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** "isDefault": true
+***REMOVED******REMOVED******REMOVED******REMOVED***}
 ***REMOVED******REMOVED***  }
 ***REMOVED*** ]
 }

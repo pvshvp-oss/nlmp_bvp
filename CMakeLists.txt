@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.9)
 
 project(NLMP_BVP)
 
-include_directories(include /home/shivanandvp/eigen)
+include_directories(include ~/eigen)
 file(GLOB SOURCES "src/*")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin)
