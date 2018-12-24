@@ -1,4 +1,3 @@
-/*
 // Author: shivanandvp (shivanandvp.oss@gmail.com)
 
 // ===============================
@@ -9,6 +8,7 @@
 #include <boost/numeric/odeint.hpp>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For the initial value problem (IVP) solver
 #include <nlmp_bvp.hpp>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For the function declarations***REMOVED***
 #include <Eigen/MPRealSupport>
+#include <unistd.h>
 using namespace mpfr;
 using namespace std;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  //
 using namespace Eigen;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***//
@@ -37,9 +37,11 @@ BVPSolution nlmp_bvp(
 ***REMOVED*** RowVectorXm tBC,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // tBC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED*** VectorXm oxt1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // oxt1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)***REMOVED*** 
 ***REMOVED*** VectorXm dxBydt(mpreal t, VectorXm x), // dxBydt***REMOVED******REMOVED******REMOVED***= a function that defines the derivative of a state vector x at t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
-***REMOVED*** VectorXm BCResidues(MatrixXd xBC),***REMOVED*** // BCResidues***REMOVED***  = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
+***REMOVED*** VectorXm BCResidues(MatrixXm xBC),***REMOVED*** // BCResidues***REMOVED***  = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
 ***REMOVED*** IVAMParameters ivamParameters***REMOVED******REMOVED******REMOVED*** // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 ***REMOVED*** ){  
+
+***REMOVED******REMOVED***  mpreal::set_default_prec(256);
 
 ***REMOVED******REMOVED***  // Variable declarations  
 ***REMOVED******REMOVED***  int omega = 0.5; 
@@ -55,9 +57,9 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  mpreal kG;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // kG***REMOVED******REMOVED******REMOVED***= the Root Mean Square (RMS) error of boundary residues at a particular iteration k
 ***REMOVED******REMOVED***  mpreal kGPrev;***REMOVED******REMOVED******REMOVED******REMOVED***// kGPrev***REMOVED***  = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
 ***REMOVED******REMOVED***  RowVectorXm tSol(nGrid);***REMOVED*** // tSol***REMOVED******REMOVED******REMOVED***= the independent variable t over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (1xnGrid)
-***REMOVED******REMOVED***  MatrixXd xSol(n,nGrid);***REMOVED***  // xSol***REMOVED******REMOVED******REMOVED***= the state vector x integrated over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nxnGrid)
+***REMOVED******REMOVED***  MatrixXm xSol(n,nGrid);***REMOVED***  // xSol***REMOVED******REMOVED******REMOVED***= the state vector x integrated over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nxnGrid)
 ***REMOVED******REMOVED***  RowVectorXm tSolPert(nGrid);***REMOVED***// tSolPert***REMOVED******REMOVED***  = the independent variable t over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED******REMOVED***-- (1xnGrid)***REMOVED*** 
-***REMOVED******REMOVED***  MatrixXd xSolPert(n,nGrid);***REMOVED*** // xSolPert***REMOVED******REMOVED***  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED***-- (nxnGrid)
+***REMOVED******REMOVED***  MatrixXm xSolPert(n,nGrid);***REMOVED*** // xSolPert***REMOVED******REMOVED***  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED***-- (nxnGrid)
 ***REMOVED******REMOVED***  RowVectorXi BCCols(m);***REMOVED******REMOVED***// BCCols***REMOVED******REMOVED*** = the columns in the grid that correspond to boundary values***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED******REMOVED***  VectorXm kxt1(n);***REMOVED******REMOVED***  // kxt1***REMOVED******REMOVED***= the computed initial state vector in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
 ***REMOVED******REMOVED***  VectorXm kxt1Prev(n);***REMOVED*** // kxt1Prev  = the computed initial state vector in the previous (k-1)-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
@@ -66,7 +68,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  VectorXm xt1P(n);***REMOVED******REMOVED******REMOVED*** // xt1P***REMOVED******REMOVED***  = the computed perturbed initial state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
 ***REMOVED******REMOVED***  VectorXm kg(n);***REMOVED******REMOVED******REMOVED***  // kg***REMOVED******REMOVED******REMOVED***= the boundary condition residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
 ***REMOVED******REMOVED***  VectorXm kgj(n);***REMOVED******REMOVED******REMOVED***// kgj***REMOVED******REMOVED*** = the j-th boundary condition perturbed system residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
-***REMOVED******REMOVED***  MatrixXd kS(n,n);***REMOVED******REMOVED******REMOVED***// kS***REMOVED******REMOVED******REMOVED***= the adjusting matrix for correcting the initial condition k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nxn) 
+***REMOVED******REMOVED***  MatrixXm kS(n,n);***REMOVED******REMOVED******REMOVED***// kS***REMOVED******REMOVED******REMOVED***= the adjusting matrix for correcting the initial condition k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nxn) 
 ***REMOVED******REMOVED***  BVPSolution bvpSolution;
 
 ***REMOVED******REMOVED***  // Variable definitions
@@ -76,7 +78,7 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  BCCols = ((tBC-t0*RowVectorXm::Ones(m))/h).array().round().cast<int>();
 
 ***REMOVED******REMOVED***  cout<<"BCCols = "<<BCCols<<endl;
-
+***REMOVED******REMOVED***  
 ***REMOVED******REMOVED***  // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
 ***REMOVED******REMOVED***  auto dxBydtWrapper = [dxBydt] // Captured variables
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  (const VectorXm &x, VectorXm &dxdt, mpreal t){
@@ -124,7 +126,8 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(j = 0; j < n; j++){***REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Determine the perturbation parameter
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j)));
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j)));
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kepsilonj = ivamParameters.EPSILON;
 ***REMOVED******REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Perturb the initial conditions***REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kxt1P = kxt1 + kepsilonj*MatrixXm::Identity(n,n).col(j);
@@ -156,10 +159,10 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"- kS.colPivHouseholderQr().solve(kalpha*kg) = "<<endl<<- kS.colPivHouseholderQr().solve(kalpha*kg)<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"kS*(kxt1 - kxt1Prev) = "<<endl<<kS*(kxt1 - kxt1Prev)<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"kgPrev = "<<endl<<kg<<endl;
-
-***REMOVED******REMOVED******REMOVED******REMOVED***if(k == 2){ // For debugging
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;
-***REMOVED******REMOVED******REMOVED******REMOVED***}
+***REMOVED******REMOVED******REMOVED******REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED***// if(k >= 10000){ // For debugging
+***REMOVED******REMOVED******REMOVED******REMOVED***//***REMOVED***  break;
+***REMOVED******REMOVED******REMOVED******REMOVED***// }
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***++k;
 
@@ -177,5 +180,3 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED***  return bvpSolution;
 ***REMOVED*** }
 // ===================
-
-*/

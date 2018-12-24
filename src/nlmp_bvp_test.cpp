@@ -1,4 +1,3 @@
-/*
 // Author: shivanandvp (shivanandvp.oss@gmail.com)
 
 // ===============================
@@ -10,7 +9,8 @@
 #include <Eigen/MPRealSupport>
 using namespace mpfr;
 using namespace std;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** //
-using namespace Eigen;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  //
+using namespace Eigen;  
+using MatrixXm = Matrix<mpreal, Dynamic, Dynamic>;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***//
 using VectorXm = Matrix<mpreal, Dynamic, 1>;
 using RowVectorXm = Matrix<mpreal, 1, Dynamic>; // For the convenience of declaring row vectors
 // ===============================
@@ -41,7 +41,7 @@ VectorXm dxBydt(mpreal t, VectorXm x){
 // Functions BCResidues
 // ====================
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
-VectorXm BCResidues(MatrixXd xBC){
+VectorXm BCResidues(MatrixXm xBC){
 ***REMOVED*** // VectorXm residues(6);
 ***REMOVED*** // residues(0) = xBC(0,0) - 1.076;
 ***REMOVED*** // residues(1) = xBC(1,0) + pow(xBC(1,0),2) + xBC(1,1) + xBC(1,2) + xBC(1,3) + 2.053292953504164;
@@ -52,7 +52,7 @@ VectorXm BCResidues(MatrixXd xBC){
 
 ***REMOVED*** VectorXm residues(2);
 ***REMOVED*** residues(0) = xBC(0,0) - 0;
-***REMOVED*** residues(1) = xBC(0,1) - 4;
+***REMOVED*** residues(1) = xBC(0,1) + 2;
 
 ***REMOVED*** return residues;
 }
@@ -73,7 +73,7 @@ int main(
 ***REMOVED*** cout<<"Program started..."<<endl;
 
 ***REMOVED*** // Variable declarations***REMOVED***
-***REMOVED*** // RowVectorXm t_BC(4);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
+***REMOVED*** // RowVectorXm tBC(4);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
 ***REMOVED*** // VectorXm oxt1(6);***REMOVED******REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
 ***REMOVED*** VectorXm oxt1(2);
 ***REMOVED*** RowVectorXm tBC(2);
@@ -81,7 +81,7 @@ int main(
 ***REMOVED*** IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
 ***REMOVED*** // Variable definitions
-***REMOVED*** // t_BC***REMOVED*** << 0.0, 0.8, 1.4, 2;
+***REMOVED*** // tBC***REMOVED*** << 0.0, 0.8, 1.4, 2;
 ***REMOVED*** // oxt1 << 1.07600,
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED******REMOVED***0.53800,
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED******REMOVED***0.00000,
@@ -91,7 +91,7 @@ int main(
 ***REMOVED*** // oxt1<< -1,
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED***0;  
 ***REMOVED*** tBC << 0.0, 4.0;
-***REMOVED*** oxt1<< -1,
+***REMOVED*** oxt1<< 1,
 ***REMOVED******REMOVED******REMOVED***  0;
 ***REMOVED***
 ***REMOVED*** ivamParameters.EPSILON = 1e-10; // EPSILON = the state perturbation parameter to probe the differential equation system with
@@ -131,24 +131,23 @@ int main(
 ***REMOVED*** return 0;
 }
 // =================
-*/
 
-#include <iostream>
-#include <Eigen/MPRealSupport>
-#include <Eigen/LU>
-using namespace mpfr;
-using namespace Eigen;
-int main()
-{
-  // set precision to 256 bits (double has only 53 bits)
-  mpreal::set_default_prec(256);
-  // Declare matrix and vector types with multi-precision scalar type
-  typedef Matrix<mpreal,Dynamic,Dynamic>  MatrixXmp;
-  typedef Matrix<mpreal,Dynamic,1>***REMOVED******REMOVED***  VectorXmp;
-  MatrixXmp A = MatrixXmp::Random(100,100);
-  VectorXmp b = VectorXmp::Random(100);
-  // Solve Ax=b using LU
-  VectorXmp x = A.lu().solve(b);
-  std::cout << "relative error: " << (A*x - b).norm() / b.norm() << std::endl;
-  return 0;
-}
+// #include <iostream>
+// #include <Eigen/MPRealSupport>
+// #include <Eigen/LU>
+// using namespace mpfr;
+// using namespace Eigen;
+// int main()
+// {
+//***REMOVED***// set precision to 256 bits (double has only 53 bits)
+//***REMOVED***mpreal::set_default_prec(256);
+//***REMOVED***// Declare matrix and vector types with multi-precision scalar type
+//***REMOVED***typedef Matrix<mpreal,Dynamic,Dynamic>  MatrixXmp;
+//***REMOVED***typedef Matrix<mpreal,Dynamic,1>***REMOVED******REMOVED***  VectorXmp;
+//***REMOVED***MatrixXmp A = MatrixXmp::Random(100,100);
+//***REMOVED***VectorXmp b = VectorXmp::Random(100);
+//***REMOVED***// Solve Ax=b using LU
+//***REMOVED***VectorXmp x = A.lu().solve(b);
+//***REMOVED***std::cout << "relative error: " << (A*x - b).norm() / b.norm() << std::endl;
+//***REMOVED***return 0;
+// }
