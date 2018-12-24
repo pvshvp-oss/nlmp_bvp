@@ -1,3 +1,4 @@
+/*
 // Author: Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
 
 // ===============================
@@ -6,18 +7,21 @@
 #include<iostream>                              // For the cout statements
 #include<cmath>
 #include<nlmp_bvp.hpp>                          // For the function declarations
+#include <Eigen/MPRealSupport>
+using namespace mpfr;
 using namespace std;                            //
 using namespace Eigen;                          //
-using RowVectorXd = Matrix<double, 1, Dynamic>; // For the convenience of declaring row vectors
+using VectorXm = Matrix<mpreal, Dynamic, 1>;
+using RowVectorXm = Matrix<mpreal, 1, Dynamic>; // For the convenience of declaring row vectors
 // ===============================
 
 // ================
 // Functions dxBydt
 // ================
 // dxBydt = a function that defines the derivative of a state vector x at t -- (nx1)
-VectorXd dxBydt(double t, VectorXd x){ 
-    // VectorXd dxdt(6);
-    // double r = sqrt(pow(x(0),2) + pow(x(2),2) + pow(x(4),2));
+VectorXm dxBydt(mpreal t, VectorXm x){ 
+    // VectorXm dxdt(6);
+    // mpreal r = sqrt(pow(x(0),2) + pow(x(2),2) + pow(x(4),2));
     // dxdt(0) = x(1);
     // dxdt(1) = -x(0) / pow(r,3);
     // dxdt(2) = x(3);
@@ -25,7 +29,7 @@ VectorXd dxBydt(double t, VectorXd x){
     // dxdt(4) = x(5);
     // dxdt(5) = -x(4) / pow(r,3);
 
-    VectorXd dxdt(2);
+    VectorXm dxdt(2);
     dxdt(0) = x(1);
     dxdt(1) = -fabs(x(0));
 
@@ -37,8 +41,8 @@ VectorXd dxBydt(double t, VectorXd x){
 // Functions BCResidues
 // ====================
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
-VectorXd BCResidues(MatrixXd xBC){
-    // VectorXd residues(6);
+VectorXm BCResidues(MatrixXd xBC){
+    // VectorXm residues(6);
     // residues(0) = xBC(0,0) - 1.076;
     // residues(1) = xBC(1,0) + pow(xBC(1,0),2) + xBC(1,1) + xBC(1,2) + xBC(1,3) + 2.053292953504164;
     // residues(2) = xBC(2,0) + xBC(3,0) - 0.472283099142472;
@@ -46,7 +50,7 @@ VectorXd BCResidues(MatrixXd xBC){
     // residues(4) = xBC(2,3) + xBC(4,3) - 1.57661; 
     // residues(5) = xBC(5,3) + 0.03407297218269353;
 
-    VectorXd residues(2);
+    VectorXm residues(2);
     residues(0) = xBC(0,0) - 0;
     residues(1) = xBC(0,1) - 4;
 
@@ -63,14 +67,16 @@ int main(
     char **argv // argv = an array of strings that are passed to  the program 
     ){
 
+    mpreal::set_default_prec(256);
+
     cout<<endl;
     cout<<"Program started..."<<endl;
 
     // Variable declarations   
-    // RowVectorXd t_BC(4);           // t_BC           = row vector of values at which the boundary conditions are specified -- (1xm)
-    // VectorXd oxt1(6);              // oxt1        = column vector of the guessed initial state                          -- (nx1)
-    VectorXd oxt1(2);
-    RowVectorXd tBC(2);
+    // RowVectorXm t_BC(4);           // t_BC           = row vector of values at which the boundary conditions are specified -- (1xm)
+    // VectorXm oxt1(6);              // oxt1        = column vector of the guessed initial state                          -- (nx1)
+    VectorXm oxt1(2);
+    RowVectorXm tBC(2);
     BVPSolution bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
@@ -125,3 +131,24 @@ int main(
     return 0;
 }
 // =================
+*/
+
+#include <iostream>
+#include <Eigen/MPRealSupport>
+#include <Eigen/LU>
+using namespace mpfr;
+using namespace Eigen;
+int main()
+{
+  // set precision to 256 bits (double has only 53 bits)
+  mpreal::set_default_prec(256);
+  // Declare matrix and vector types with multi-precision scalar type
+  typedef Matrix<mpreal,Dynamic,Dynamic>  MatrixXmp;
+  typedef Matrix<mpreal,Dynamic,1>        VectorXmp;
+  MatrixXmp A = MatrixXmp::Random(100,100);
+  VectorXmp b = VectorXmp::Random(100);
+  // Solve Ax=b using LU
+  VectorXmp x = A.lu().solve(b);
+  std::cout << "relative error: " << (A*x - b).norm() / b.norm() << std::endl;
+  return 0;
+}
