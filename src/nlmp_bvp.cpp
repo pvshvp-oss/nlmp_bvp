@@ -153,17 +153,13 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***kxt1 = kxt1 - kS.colPivHouseholderQr().solve(kalpha*kg);
 ***REMOVED******REMOVED******REMOVED******REMOVED***kGPrev = kG;
 
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"kxt1Prev = "<<endl<<kxt1Prev<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"kxt1 = "<<endl<<kxt1<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"kS = "<<endl<<kS<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"- kS.colPivHouseholderQr().solve(kalpha*kg) = "<<endl<<- kS.colPivHouseholderQr().solve(kalpha*kg)<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"kS*(kxt1 - kxt1Prev) = "<<endl<<kS*(kxt1 - kxt1Prev)<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"kgPrev = "<<endl<<kg<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"kxt1Prev = "<<endl<<kxt1Prev<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"kxt1 = "<<endl<<kxt1<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"kS = "<<endl<<kS<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"- kS.colPivHouseholderQr().solve(kalpha*kg) = "<<endl<<- kS.colPivHouseholderQr().solve(kalpha*kg)<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"kS*(kxt1 - kxt1Prev) = "<<endl<<kS*(kxt1 - kxt1Prev)<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"kgPrev = "<<endl<<kg<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED***// if(k >= 10000){ // For debugging
-***REMOVED******REMOVED******REMOVED******REMOVED***//***REMOVED***  break;
-***REMOVED******REMOVED******REMOVED******REMOVED***// }
-
 ***REMOVED******REMOVED******REMOVED******REMOVED***++k;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the initial value problem***REMOVED***
@@ -172,7 +168,14 @@ BVPSolution nlmp_bvp(
 ***REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(StepperType(), dxBydtWrapper, xt1, t0, tm, h, storeSol); 
 ***REMOVED******REMOVED******REMOVED******REMOVED***kg = BCResidues(xSol(Eigen::all, BCCols));
 ***REMOVED******REMOVED******REMOVED******REMOVED***kG = kg.norm()/sqrt(n);
+
+***REMOVED******REMOVED******REMOVED******REMOVED***if(k >= 100){ // For debugging
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;
+***REMOVED******REMOVED******REMOVED******REMOVED***}
 ***REMOVED******REMOVED***  }  
+
+***REMOVED******REMOVED***  cout<<"Ran "<<k<<" iterations."<<endl;
+
 ***REMOVED******REMOVED***  bvpSolution.t***REMOVED*** = tSol;
 ***REMOVED******REMOVED***  bvpSolution.x***REMOVED*** = xSol;
 ***REMOVED******REMOVED***  bvpSolution.tBC = tBC;

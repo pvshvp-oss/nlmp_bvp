@@ -29,9 +29,14 @@ VectorXm dxBydt(mpreal t, VectorXm x){
 ***REMOVED*** // dxdt(4) = x(5);
 ***REMOVED*** // dxdt(5) = -x(4) / pow(r,3);
 
-***REMOVED*** VectorXm dxdt(2);
+***REMOVED*** // VectorXm dxdt(2);
+***REMOVED*** // dxdt(0) = x(1);
+***REMOVED*** // dxdt(1) = -fabs(x(0));
+
+***REMOVED*** VectorXm dxdt(3);
 ***REMOVED*** dxdt(0) = x(1);
-***REMOVED*** dxdt(1) = -fabs(x(0));
+***REMOVED*** dxdt(1) = x(2);
+***REMOVED*** dxdt(2) = 25*x(1) - 1;
 
 ***REMOVED*** return dxdt;
 }
@@ -50,9 +55,14 @@ VectorXm BCResidues(MatrixXm xBC){
 ***REMOVED*** // residues(4) = xBC(2,3) + xBC(4,3) - 1.57661; 
 ***REMOVED*** // residues(5) = xBC(5,3) + 0.03407297218269353;
 
-***REMOVED*** VectorXm residues(2);
-***REMOVED*** residues(0) = xBC(0,0) - 0;
-***REMOVED*** residues(1) = xBC(0,1) + 2;
+***REMOVED*** // VectorXm residues(2);
+***REMOVED*** // residues(0) = xBC(0,0) - 0;
+***REMOVED*** // residues(1) = xBC(0,1) + 2;
+
+***REMOVED*** VectorXm residues(3);
+***REMOVED*** residues(0) = xBC(1,0) - 0;
+***REMOVED*** residues(1) = xBC(1,2) - 0;
+***REMOVED*** residues(2) = xBC(0,1) - 0;
 
 ***REMOVED*** return residues;
 }
@@ -75,8 +85,10 @@ int main(
 ***REMOVED*** // Variable declarations***REMOVED***
 ***REMOVED*** // RowVectorXm tBC(4);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
 ***REMOVED*** // VectorXm oxt1(6);***REMOVED******REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
-***REMOVED*** VectorXm oxt1(2);
-***REMOVED*** RowVectorXm tBC(2);
+***REMOVED*** // VectorXm oxt1(2);
+***REMOVED*** // RowVectorXm tBC(2);
+***REMOVED*** VectorXm oxt1(3);
+***REMOVED*** RowVectorXm tBC(3);
 ***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
@@ -90,9 +102,13 @@ int main(
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED******REMOVED***0.49883;  
 ***REMOVED*** // oxt1<< -1,
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED***0;  
-***REMOVED*** tBC << 0.0, 4.0;
-***REMOVED*** oxt1<< 1,
-***REMOVED******REMOVED******REMOVED***  0;
+***REMOVED*** // tBC << 0.0, 4.0;
+***REMOVED*** // oxt1<< -1,
+***REMOVED*** //***REMOVED******REMOVED***  0;
+***REMOVED*** tBC << 0.0, 0.5, 1.0;
+***REMOVED*** oxt1 << 1,
+***REMOVED******REMOVED******REMOVED******REMOVED***1,
+***REMOVED******REMOVED******REMOVED******REMOVED***1;
 ***REMOVED***
 ***REMOVED*** ivamParameters.EPSILON = 1e-10; // EPSILON = the state perturbation parameter to probe the differential equation system with
 ***REMOVED*** ivamParameters.ALPHA***REMOVED***= 1.0;***REMOVED***// ALPHA***REMOVED***= the relaxation factor to scale the adjustment to the initial condition
@@ -106,7 +122,7 @@ int main(
 ***REMOVED*** 
 ***REMOVED*** // Solve the boundary value problem
 ***REMOVED*** // bvpSolution = nlmp_bvp(6, 4, 501, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
-***REMOVED*** bvpSolution = nlmp_bvp(2, 2, 11, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+***REMOVED*** bvpSolution = nlmp_bvp(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** cout<<"Done solving the BVP..."<<endl;
 
