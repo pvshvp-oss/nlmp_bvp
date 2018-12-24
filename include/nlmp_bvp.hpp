@@ -1,5 +1,3 @@
-/*
-
 // Author: Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
 
 // ===============================
@@ -9,6 +7,7 @@
 using namespace Eigen;                          //
 #include <Eigen/MPRealSupport>
 using namespace mpfr;
+using MatrixXm = Matrix<mpreal, Dynamic, Dynamic>;
 using VectorXm = Matrix<mpreal, Dynamic, 1>;
 using RowVectorXm = Matrix<mpreal, 1, Dynamic>; // For the convenience of declaring row vectors
 // ===============================
@@ -30,9 +29,9 @@ struct IVAMParameters{
 // =====================
 struct BVPSolution{
     RowVectorXm t;    // t    = row vector of values at which state vectors x are evaluated                       -- (1xnGrid)
-    MatrixXd x;       // x    = state vectors at all grid points t                                                -- (nxnGrid)  
+    MatrixXm x;       // x    = state vectors at all grid points t                                                -- (nxnGrid)  
     RowVectorXm tBC; // tBC = row vector of boundary condition values at which state vectors xBC are evaluated -- (1xm)   
-    MatrixXd xBC;    // xBC = state vectors at boundary conditions tBC                                         -- (nxm)
+    MatrixXm xBC;    // xBC = state vectors at boundary conditions tBC                                         -- (nxm)
 };
 // =====================
 
@@ -46,8 +45,7 @@ BVPSolution nlmp_bvp(
     RowVectorXm tBC,                      // tBC           = row vector of values at which the boundary conditions are specified           -- (1xm)
     VectorXm oxt1,                      // oxt1        = column vector of the guessed initial state                                    -- (nx1)    
     VectorXm dxBydt(mpreal t, VectorXm x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXm BCResidues(MatrixXd xBC),    // BCResidues     = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
+    VectorXm BCResidues(MatrixXm xBC),    // BCResidues     = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
     IVAMParameters ivamParameters          // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     );
 // ===================
-*/

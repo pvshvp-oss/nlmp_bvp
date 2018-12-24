@@ -1,4 +1,3 @@
-/*
 // Author: Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
 
 // ===============================
@@ -9,6 +8,7 @@
 #include <boost/numeric/odeint.hpp>                          // For the initial value problem (IVP) solver
 #include <nlmp_bvp.hpp>                                      // For the function declarations   
 #include <Eigen/MPRealSupport>
+#include <unistd.h>
 using namespace mpfr;
 using namespace std;                                         //
 using namespace Eigen;                                       //
@@ -37,9 +37,11 @@ BVPSolution nlmp_bvp(
     RowVectorXm tBC,                      // tBC           = row vector of values at which the boundary conditions are specified           -- (1xm)
     VectorXm oxt1,                      // oxt1        = column vector of the guessed initial state                                    -- (nx1)    
     VectorXm dxBydt(mpreal t, VectorXm x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXm BCResidues(MatrixXd xBC),    // BCResidues     = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
+    VectorXm BCResidues(MatrixXm xBC),    // BCResidues     = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
     IVAMParameters ivamParameters          // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     ){  
+
+        mpreal::set_default_prec(256);
 
         // Variable declarations  
         int omega = 0.5; 
@@ -55,9 +57,9 @@ BVPSolution nlmp_bvp(
         mpreal kG;                // kG         = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
         mpreal kGPrev;            // kGPrev     = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
         RowVectorXm tSol(nGrid);    // tSol         = the independent variable t over the whole grid in the solution of the IVP solver                   -- (1xnGrid)
-        MatrixXd xSol(n,nGrid);     // xSol         = the state vector x integrated over the whole grid in the solution of the IVP solver                -- (nxnGrid)
+        MatrixXm xSol(n,nGrid);     // xSol         = the state vector x integrated over the whole grid in the solution of the IVP solver                -- (nxnGrid)
         RowVectorXm tSolPert(nGrid);   // tSolPert        = the independent variable t over the whole grid in the perturbed solution of the IVP solver         -- (1xnGrid)    
-        MatrixXd xSolPert(n,nGrid);    // xSolPert        = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
+        MatrixXm xSolPert(n,nGrid);    // xSolPert        = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
         RowVectorXi BCCols(m);      // BCCols       = the columns in the grid that correspond to boundary values                                         -- (1xm)
         VectorXm kxt1(n);        // kxt1      = the computed initial state vector in the k-th iteration                                            -- (nx1)
         VectorXm kxt1Prev(n);    // kxt1Prev  = the computed initial state vector in the previous (k-1)-th iteration                               -- (nx1)
@@ -66,7 +68,7 @@ BVPSolution nlmp_bvp(
         VectorXm xt1P(n);          // xt1P        = the computed perturbed initial state vector to be input to the IVP solver                          -- (nx1)
         VectorXm kg(n);           // kg         = the boundary condition residues in the k-th iteration                                              -- (nx1)
         VectorXm kgj(n);         // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                        -- (nx1)
-        MatrixXd kS(n,n);         // kS         = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
+        MatrixXm kS(n,n);         // kS         = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
         BVPSolution bvpSolution;
 
         // Variable definitions
@@ -76,7 +78,7 @@ BVPSolution nlmp_bvp(
         BCCols = ((tBC-t0*RowVectorXm::Ones(m))/h).array().round().cast<int>();
 
         cout<<"BCCols = "<<BCCols<<endl;
-
+        
         // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
         auto dxBydtWrapper = [dxBydt] // Captured variables
                              (const VectorXm &x, VectorXm &dxdt, mpreal t){
@@ -124,7 +126,8 @@ BVPSolution nlmp_bvp(
             }
             for(j = 0; j < n; j++){    
                 // Determine the perturbation parameter
-                kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j)));
+                // kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j)));
+                kepsilonj = ivamParameters.EPSILON;
             
                 // Perturb the initial conditions   
                 kxt1P = kxt1 + kepsilonj*MatrixXm::Identity(n,n).col(j);
@@ -156,10 +159,10 @@ BVPSolution nlmp_bvp(
             cout<<"- kS.colPivHouseholderQr().solve(kalpha*kg) = "<<endl<<- kS.colPivHouseholderQr().solve(kalpha*kg)<<endl;
             cout<<"kS*(kxt1 - kxt1Prev) = "<<endl<<kS*(kxt1 - kxt1Prev)<<endl;
             cout<<"kgPrev = "<<endl<<kg<<endl;
-
-            if(k == 2){ // For debugging
-                break;
-            }
+            
+            // if(k >= 10000){ // For debugging
+            //     break;
+            // }
 
             ++k;
 
@@ -177,5 +180,3 @@ BVPSolution nlmp_bvp(
         return bvpSolution;
     }
 // ===================
-
-*/
