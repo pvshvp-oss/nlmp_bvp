@@ -1,3 +1,5 @@
+// Author: Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
+
 // ===============================
 // Includes and global definitions
 // ===============================
@@ -27,14 +29,15 @@ BVPSolution nlmp_bvp(
     int n,                                 // n              = the number of differential equations = the number of boundary conditions
     int m,                                 // m              = the number of nodes at which boundary conditions are specified
     int nGrid,                             // nGrid          = the number of points at which the state is evaluated
-    RowVectorXd t_BC,                      // t_BC           = row vector of values at which the boundary conditions are specified           -- (1xm)
-    VectorXd _0_x_t1,                      // _0_x_t1        = column vector of the guessed initial state                                    -- (nx1)    
+    RowVectorXd tBC,                      // tBC           = row vector of values at which the boundary conditions are specified           -- (1xm)
+    VectorXd oxt1,                      // oxt1        = column vector of the guessed initial state                                    -- (nx1)    
     VectorXd dxBydt(double t, VectorXd x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXd BCResidues(MatrixXd x_BC),    // BCResidues     = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+    VectorXd BCResidues(MatrixXd xBC),    // BCResidues     = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
     IVAMParameters ivamParameters          // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     ){  
 
-        // Variable declarations   
+        // Variable declarations  
+        int omega = 0.5; 
         int j;                      // j            = the inner iterating variable for IVAM                                                              -- [0,n-1]
         int k;                      // k            = the outer iterating variable for IVAM                                                              -- [0,Inf)
         int iCol;                   // iCol         = the column index of the x solution for the IVP solver                                              -- [0,nGrid-1]
@@ -42,30 +45,30 @@ BVPSolution nlmp_bvp(
         double h;                   // h            = the stepper step size for the IVP solver                                 -- [0,nGrid-1] 
         double t0;                  // t0           = the first boundary value of the independent variable
         double tm;                  // tm           = the last boundary value of the independent variable
-        double _k_epsilon_j;        // _k_epsilon_j = the perturbation parameter for a state variable at a particular iteration k
-        double _k_alpha;            // _k_alpha     = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
-        double _k_G;                // _k_G         = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
-        double _k_GPrev;            // _k_GPrev     = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
+        double kepsilonj;           // kepsilonj = the perturbation parameter for a state variable at a particular iteration k
+        double kalpha;            // kalpha     = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
+        double kG;                // kG         = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
+        double kGPrev;            // kGPrev     = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
         RowVectorXd tSol(nGrid);    // tSol         = the independent variable t over the whole grid in the solution of the IVP solver                   -- (1xnGrid)
         MatrixXd xSol(n,nGrid);     // xSol         = the state vector x integrated over the whole grid in the solution of the IVP solver                -- (nxnGrid)
-        RowVectorXd tsolP(nGrid);   // tsolP        = the independent variable t over the whole grid in the perturbed solution of the IVP solver         -- (1xnGrid)    
-        MatrixXd xSolP(n,nGrid);    // xSolP        = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
+        RowVectorXd tSolPert(nGrid);   // tSolPert        = the independent variable t over the whole grid in the perturbed solution of the IVP solver         -- (1xnGrid)    
+        MatrixXd xSolPert(n,nGrid);    // xSolPert        = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
         RowVectorXi BCCols(m);      // BCCols       = the columns in the grid that correspond to boundary values                                         -- (1xm)
-        VectorXd _k_x_t1(n);        // _k_x_t1      = the computed initial state vector in the k-th iteration                                            -- (nx1)
-        VectorXd _k_x_t1Prev(n);    // _k_x_t1Prev  = the computed initial state vector in the previous (k-1)-th iteration                               -- (nx1)
-        VectorXd _k_x_t1P(n);       // _k_x_t1      = the computed perturbed initial state vector in the k-th iteration                                  -- (nx1)
-        VectorXd x_t1(n);           // x_t1         = the computed initial state vector to be input to the IVP solver                                    -- (nx1)
-        VectorXd x_t1P(n);          // x_t1P        = the computed perturbed initial state vector to be input to the IVP solver                          -- (nx1)
-        VectorXd _k_g(n);           // _k_g         = the boundary condition residues in the k-th iteration                                              -- (nx1)
-        VectorXd _k_g_j(n);         // _k_g_j       = the j-th boundary condition perturbed system residues in the k-th iteration                        -- (nx1)
-        MatrixXd _k_S(n,n);         // _k_S         = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
+        VectorXd kxt1(n);        // kxt1      = the computed initial state vector in the k-th iteration                                            -- (nx1)
+        VectorXd kxt1Prev(n);    // kxt1Prev  = the computed initial state vector in the previous (k-1)-th iteration                               -- (nx1)
+        VectorXd kxt1P(n);       // kxt1      = the computed perturbed initial state vector in the k-th iteration                                  -- (nx1)
+        VectorXd xt1(n);           // xt1         = the computed initial state vector to be input to the IVP solver                                    -- (nx1)
+        VectorXd xt1P(n);          // xt1P        = the computed perturbed initial state vector to be input to the IVP solver                          -- (nx1)
+        VectorXd kg(n);           // kg         = the boundary condition residues in the k-th iteration                                              -- (nx1)
+        VectorXd kgj(n);         // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                        -- (nx1)
+        MatrixXd kS(n,n);         // kS         = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
         BVPSolution bvpSolution;
 
         // Variable definitions
-        t0     = t_BC(0);
-        tm     = t_BC(m-1);
+        t0     = tBC(0);
+        tm     = tBC(m-1);
         h      = (tm - t0)/(nGrid-1);
-        BCCols = ((t_BC-t0*RowVectorXd::Ones(m))/h).array().round().cast<int>();
+        BCCols = ((tBC-t0*RowVectorXd::Ones(m))/h).array().round().cast<int>();
 
         cout<<"BCCols = "<<BCCols<<endl;
 
@@ -84,74 +87,91 @@ BVPSolution nlmp_bvp(
         };
 
         // Observer to store the perturbed solutions of the IVP Solver
-        auto storeSolP = [&iColP, &tsolP, &xSolP] // Captured variables
+        auto storeSolP = [&iColP, &tSolPert, &xSolPert] // Captured variables
                          (const VectorXd &x , const double t){
-            tsolP(iColP)     = t;                    
-            xSolP.col(iColP) = x;            
+            tSolPert(iColP)     = t;                    
+            xSolPert.col(iColP) = x;            
             ++iColP;            
         };       
  
-        _k_GPrev    = INF;
-        _k_alpha    = ivamParameters.ALPHA;
+        kGPrev    = INF;
+        kalpha    = ivamParameters.ALPHA;
         k           = 0;       // Set k for the first time
-        _k_x_t1     = _0_x_t1; // Assign the initial condition state vector for the 0-th iteration
-        _k_x_t1Prev = _k_x_t1;
+        kxt1     = oxt1; // Assign the initial condition state vector for the 0-th iteration
+        kxt1Prev = kxt1;
 
         // Solve the initial value problem for the first time 
-        x_t1     = _k_x_t1; // Assign the current initial condition state vector to a dummy variable
+        xt1     = kxt1; // Assign the current initial condition state vector to a dummy variable
         iCol     = 0;       // Set the solution column index to 0 before the IVP solver starts integrating
-        integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
-        _k_g = BCResidues(xSol(Eigen::all, BCCols));
-        _k_G = _k_g.norm()/sqrt(n);
-        while(_k_G > ivamParameters.SIGMA){ 
-
-            cout<<"k = "<<k<<"... _k_G = "<<_k_G<<"... _k_GPrev = "<<_k_GPrev<<endl;
-
-            if(_k_G < 0.1*_k_GPrev) {
-                // cout<<"Going too fast. Changing alpha from "<<_k_alpha<<" to "<<fmin(1.2*_k_alpha, 1.0)<<"..."<<endl;
-                 _k_alpha = fmin(1.2*_k_alpha, 1.0);                
-            } else if(_k_G >= _k_GPrev){
-                // cout<<"Error increased. Changing alpha from "<<_k_alpha<<" to "<<0.8*_k_alpha<<"..."<<endl;
-                _k_alpha = 0.8*_k_alpha;
-                _k_x_t1 = _k_x_t1Prev;
-                //skipInternalLoop = true;                
-            }  
+        integrate_const(StepperType(), dxBydtWrapper, xt1, t0, tm, h, storeSol); 
+        kg = BCResidues(xSol(Eigen::all, BCCols));
+        kG = kg.norm()/sqrt(n);
+        while(kG > ivamParameters.SIGMA){            
+            if(kG < 0.01*kGPrev) {
+                cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" Inc alpha..."<<endl;
+                kalpha = fmin(1.2*kalpha, 1.0); 
+            } else if(kG >= kGPrev){
+                cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" Dec alpha..."<<endl;                
+                kalpha = 0.8*kalpha;        
+                kxt1 = kxt1Prev;
+            } else{
+                cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<endl;
+            }
             for(j = 0; j < n; j++){   
                 // Determine the perturbation parameter
-                _k_epsilon_j = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * _k_x_t1(j)));
+                kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j)));
             
                 // Perturb the initial conditions   
-                _k_x_t1P = _k_x_t1 + _k_epsilon_j*MatrixXd::Identity(n,n).col(j);
+                kxt1P = kxt1 + kepsilonj*MatrixXd::Identity(n,n).col(j);
                 
                 // Solve the perturbed initial value problem   
-                x_t1P = _k_x_t1P; // Assign the current initial condition state vector to a dummy variable    
+                xt1P = kxt1P; // Assign the current initial condition state vector to a dummy variable    
                 iColP  = 0;        // Set the solution column index to 0 before the IVP solver starts integrating     
-                integrate_const(StepperType(), dxBydtWrapper, x_t1P, t0, tm, h, storeSolP); 
-                _k_g_j =  BCResidues(xSolP(Eigen::all, BCCols));
+                integrate_const(StepperType(), dxBydtWrapper, xt1P, t0, tm, h, storeSolP); 
+                kgj =  BCResidues(xSolPert(Eigen::all, BCCols));
 
-                // Compute a column of the adjusting matrix                
-                _k_S.col(j) = (_k_g_j- _k_g)/_k_epsilon_j;                
+                // Compute a column of the adjusting matrix 
+                // cout<<"kS cols : "<<kS.cols()<<endl;             
+                // cout<<"kS rows : "<<kS.rows()<<endl;  
+                // cout<<"kgj - kg cols: "<<(kgj - kg).cols()<<endl;
+                // cout<<"kgj - kg rows: "<<(kgj - kg).rows()<<endl;
+                kS.col(j) = (kgj - kg)*pow(kepsilonj,-1);  
             }
 
-            // Solve the linarized adjusting equation
-            _k_x_t1Prev = _k_x_t1; 
-            _k_x_t1 = _k_x_t1 - _k_S.colPivHouseholderQr().solve(_k_alpha*_k_g);
-            //_k_x_t1 = _k_x_t1 - _k_alpha * _k_S.fullPivLu().inverse() *_k_g;
-            _k_GPrev = _k_G;
+            kalpha = 1;
+            // Solve the linarized adjusting equation            
+            kxt1Prev = kxt1; 
+            // kxt1 = kxt1 - kS.colPivHouseholderQr().solve(kalpha*kg);
+            kxt1 = kxt1 - kS.colPivHouseholderQr().solve(kalpha*kg);
+            kGPrev = kG;
+
+            if(k == 5){ // For debugging
+                cout<<"kxt1Prev = "<<endl<<kxt1Prev<<endl;
+                cout<<"kxt1 = "<<endl<<kxt1<<endl;
+                cout<<"kS = "<<endl<<kS<<endl;
+                cout<<"- kS.colPivHouseholderQr().solve(kalpha*kg) = "<<endl<<- kS.colPivHouseholderQr().solve(kalpha*kg)<<endl;
+                cout<<"kS*(kxt1 - kxt1Prev) = "<<endl<<kS*(kxt1 - kxt1Prev)<<endl;
+                cout<<"kgPrev = "<<endl<<kg<<endl;
+            }
+
             ++k;
 
             // Solve the initial value problem   
-            x_t1     = _k_x_t1; // Assign the current initial condition state vector to a dummy variable
+            xt1     = kxt1; // Assign the current initial condition state vector to a dummy variable
             iCol     = 0;       // Set the solution column index to 0 before the IVP solver starts integrating
-            integrate_const(StepperType(), dxBydtWrapper, x_t1, t0, tm, h, storeSol); 
-            _k_g = BCResidues(xSol(Eigen::all, BCCols));
-            _k_G = _k_g.norm()/sqrt(n);   
+            integrate_const(StepperType(), dxBydtWrapper, xt1, t0, tm, h, storeSol); 
+            kg = BCResidues(xSol(Eigen::all, BCCols));
+            kG = kg.norm()/sqrt(n);   
+
+            if(k == 6){ // For debugging
+                cout<<"kg = "<<endl<<kg<<endl;
+            }
 
         }  
         bvpSolution.t    = tSol;
         bvpSolution.x    = xSol;
-        bvpSolution.t_BC = t_BC;
-        bvpSolution.x_BC = xSol(Eigen::all, BCCols);
+        bvpSolution.tBC = tBC;
+        bvpSolution.xBC = xSol(Eigen::all, BCCols);
         return bvpSolution;
     }
 // ===================

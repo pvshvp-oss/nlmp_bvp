@@ -1,3 +1,5 @@
+// Author: Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
+
 // ===============================
 // Includes and global definitions
 // ===============================
@@ -24,8 +26,8 @@ struct IVAMParameters{
 struct BVPSolution{
     RowVectorXd t;    // t    = row vector of values at which state vectors x are evaluated                       -- (1xnGrid)
     MatrixXd x;       // x    = state vectors at all grid points t                                                -- (nxnGrid)  
-    RowVectorXd t_BC; // t_BC = row vector of boundary condition values at which state vectors x_BC are evaluated -- (1xm)   
-    MatrixXd x_BC;    // x_BC = state vectors at boundary conditions t_BC                                         -- (nxm)
+    RowVectorXd tBC; // tBC = row vector of boundary condition values at which state vectors xBC are evaluated -- (1xm)   
+    MatrixXd xBC;    // xBC = state vectors at boundary conditions tBC                                         -- (nxm)
 };
 // =====================
 
@@ -36,10 +38,10 @@ BVPSolution nlmp_bvp(
     int n,                                 // n              = the number of differential equations = the number of boundary conditions
     int m,                                 // m              = the number of nodes at which boundary conditions are specified
     int nGrid,                             // nGrid          = the number of points at which the state is evaluated
-    RowVectorXd t_BC,                      // t_BC           = row vector of values at which the boundary conditions are specified           -- (1xm)
-    VectorXd _0_x_t1,                      // _0_x_t1        = column vector of the guessed initial state                                    -- (nx1)    
+    RowVectorXd tBC,                      // tBC           = row vector of values at which the boundary conditions are specified           -- (1xm)
+    VectorXd oxt1,                      // oxt1        = column vector of the guessed initial state                                    -- (nx1)    
     VectorXd dxBydt(double t, VectorXd x), // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXd BCResidues(MatrixXd x_BC),    // BCResidues     = a function that defines the boundary condition residues at state vectors x_BC -- (nx1) 
+    VectorXd BCResidues(MatrixXd xBC),    // BCResidues     = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
     IVAMParameters ivamParameters          // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     );
 // ===================

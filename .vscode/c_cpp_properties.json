@@ -1,15 +1,24 @@
 {
-    "name": "Linux",
-    "includePath": [
-        "/usr/include/eigen3"
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "configurationProvider": "vector-of-bool.cmake-tools",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "${workspaceFolder}/**"
+                ]
+            },
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        }
     ],
-    "defines": [],
-    "intelliSenseMode": "clang-x64",
-    "browse": {
-        "path": [
-            "/usr/include/eigen3"
-        ],
-        "limitSymbolsToIncludedHeaders": false,
-        "databaseFilename": ""
-    }
+    "version": 4
 }
