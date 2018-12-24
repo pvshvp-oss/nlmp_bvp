@@ -150,7 +150,7 @@ BVPSolution nlmp_bvp(
                 kS.col(j) = (kgj - kg)*pow(kepsilonj,-1);  
             }
 
-            // kalpha = 1;
+            kalpha = 1;
             // Solve the linarized adjusting equation            
             kxt1Prev = kxt1; 
             kxt1 = kxt1 - kS.colPivHouseholderQr().solve(kalpha*kg);

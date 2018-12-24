@@ -3,6 +3,19 @@
 // Email : shivanand.pattanshetti@gmail.com
 // ========================================
 
+// ============================
+// Credits for example problems
+// ============================
+/* Boundary Value Problem 1 */
+// "Using Initial Guess to Indicate Desired Solution"
+// “bvp4c.” Mathworks Documentation, Mathworks, www.mathworks.com/help/matlab/ref/bvp4c.html
+
+/* Boundary value problem 2 */
+// Example 2
+// Tr, Ramesh. (2017). A novel method for solving multipoint boundary value problems.
+// Global Journal of Pure and Applied Mathematics. 13. 850-857. 
+// ============================
+
 // ===============================
 // Includes and global definitions
 // ===============================
@@ -24,16 +37,16 @@ using RowVectorXm = Matrix<mpreal, 1, Dynamic>;       // Dynamic size row vector
 // dxBydt = a function that defines the derivative of a state vector x at t -- (nx1)
 VectorXm dxBydt(mpreal t, VectorXm x){ 
 
-    // Boundary Value Problem 1
-    // VectorXm dxdt(2);
-    // dxdt(0) = x(1);
-    // dxdt(1) = -fabs(x(0));
-
-    // Boundary Value Problem 2
-    VectorXm dxdt(3);
+    /* Boundary Value Problem 1 */
+    VectorXm dxdt(2);
     dxdt(0) = x(1);
-    dxdt(1) = x(2);
-    dxdt(2) = 25*x(1) - 1;
+    dxdt(1) = -fabs(x(0));
+
+    /* Boundary Value Problem 2 */
+    // VectorXm dxdt(3);
+    // dxdt(0) = x(1);
+    // dxdt(1) = x(2);
+    // dxdt(2) = 25*x(1) - 1;
 
     return dxdt;
 }
@@ -45,15 +58,15 @@ VectorXm dxBydt(mpreal t, VectorXm x){
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
 VectorXm BCResidues(MatrixXm xBC){
     /* Boundary Value Problem 1 */
-    // VectorXm residues(2);
-    // residues(0) = xBC(0,0) - 0;
-    // residues(1) = xBC(0,1) + 2;
+    VectorXm residues(2);
+    residues(0) = xBC(0,0) - 0;
+    residues(1) = xBC(0,1) + 2;
 
     /* Boundary Value Problem 2 */
-    VectorXm residues(3);
-    residues(0) = xBC(1,0) - 0;
-    residues(1) = xBC(1,2) - 0;
-    residues(2) = xBC(0,1) - 0;
+    // VectorXm residues(3);
+    // residues(0) = xBC(1,0) - 0;
+    // residues(1) = xBC(1,2) - 0;
+    // residues(2) = xBC(0,1) - 0;
 
     return residues;
 }
@@ -79,30 +92,31 @@ int main(
     // Variable declarations   
 
     /* Boundary Value Problem 1 */
-    // RowVectorXm tBC(2);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
-    // VectorXm oxt1(2);           // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+    RowVectorXm tBC(2);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    VectorXm oxt1(2);           // oxt1           = column vector of the guessed initial state                                       -- (nx1)
 
     /* Boundary Value Problem 2 */
-    RowVectorXm  tBC(3);           // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
-    VectorXm    oxt1(3);           // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+    // RowVectorXm  tBC(3);           // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    // VectorXm    oxt1(3);           // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+
     BVPSolution bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
     // Variable definitions
 
     /* Boundary Value Problem 1 */
-    // tBC  << 0.0, 4.0;            // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-    // oxt1 << -1,                  // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
-    //          0;  
-    // tBC  << 0.0, 4.0;            // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-    // oxt1 << -1,                  // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
+    tBC  << 0.0, 4.0;               // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    oxt1 <<  1,                     // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
+             0;  
+    // tBC  << 0.0, 4.0;               // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    // oxt1 << -1,                     // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
     //          0;
 
     /* Boundary Value Problem 2 */
-    tBC  << 0.0, 0.5, 1.0;          // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-    oxt1 << 1,                      // oxt1 = column vector of the guessed initial state                                        -- (nx1)
-            1,
-            1;
+    // tBC  << 0.0, 0.5, 1.0;          // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    // oxt1 << 1,                      // oxt1 = column vector of the guessed initial state                                        -- (nx1)
+    //         1,
+    //         1;
    
     // Assign the parameters for IVAM
     ivamParameters.EPSILON = 1e-10; // EPSILON = the state perturbation parameter to probe the differential equation system with
@@ -118,10 +132,10 @@ int main(
     // Solve the boundary value problem
 
     /* Boundary Value Problem 1 */
-    // bvpSolution = nlmp_bvp(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+    bvpSolution = nlmp_bvp(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     /* Boundary Value Problem 2 */
-    bvpSolution = nlmp_bvp(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+    // bvpSolution = nlmp_bvp(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     cout<<endl<<"Done solving the BVP..."<<endl;
 
