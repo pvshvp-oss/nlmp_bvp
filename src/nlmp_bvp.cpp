@@ -153,17 +153,13 @@ BVPSolution nlmp_bvp(
             kxt1 = kxt1 - kS.colPivHouseholderQr().solve(kalpha*kg);
             kGPrev = kG;
 
-            cout<<"kxt1Prev = "<<endl<<kxt1Prev<<endl;
-            cout<<"kxt1 = "<<endl<<kxt1<<endl;
-            cout<<"kS = "<<endl<<kS<<endl;
-            cout<<"- kS.colPivHouseholderQr().solve(kalpha*kg) = "<<endl<<- kS.colPivHouseholderQr().solve(kalpha*kg)<<endl;
-            cout<<"kS*(kxt1 - kxt1Prev) = "<<endl<<kS*(kxt1 - kxt1Prev)<<endl;
-            cout<<"kgPrev = "<<endl<<kg<<endl;
+            // cout<<"kxt1Prev = "<<endl<<kxt1Prev<<endl;
+            // cout<<"kxt1 = "<<endl<<kxt1<<endl;
+            // cout<<"kS = "<<endl<<kS<<endl;
+            // cout<<"- kS.colPivHouseholderQr().solve(kalpha*kg) = "<<endl<<- kS.colPivHouseholderQr().solve(kalpha*kg)<<endl;
+            // cout<<"kS*(kxt1 - kxt1Prev) = "<<endl<<kS*(kxt1 - kxt1Prev)<<endl;
+            // cout<<"kgPrev = "<<endl<<kg<<endl;
             
-            // if(k >= 10000){ // For debugging
-            //     break;
-            // }
-
             ++k;
 
             // Solve the initial value problem   
@@ -172,7 +168,14 @@ BVPSolution nlmp_bvp(
             integrate_const(StepperType(), dxBydtWrapper, xt1, t0, tm, h, storeSol); 
             kg = BCResidues(xSol(Eigen::all, BCCols));
             kG = kg.norm()/sqrt(n);
+
+            if(k >= 100){ // For debugging
+                break;
+            }
         }  
+
+        cout<<"Ran "<<k<<" iterations."<<endl;
+
         bvpSolution.t    = tSol;
         bvpSolution.x    = xSol;
         bvpSolution.tBC = tBC;
