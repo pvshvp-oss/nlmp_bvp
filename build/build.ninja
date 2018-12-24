@@ -50,13 +50,13 @@ build cmake_object_order_depends_target_nlmp_bvp_test: phony || CMakeFiles/nlmp_
 build CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp.cpp.o: CXX_COMPILER__nlmp_bvp_test ../src/nlmp_bvp.cpp || cmake_object_order_depends_target_nlmp_bvp_test
   DEP_FILE = CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp.cpp.o.d
   FLAGS = -g
-  INCLUDES = -I../include -I/home/shivanandvp/eigen
+  INCLUDES = -I../include -I/home/shivanandvp/eigen -I/home/shivanandvp/eigen/unsupported -I/home/shivanandvp/eigen/unsupported/test -I/home/shivanandvp/eigen/unsupported/test/mpreal
   OBJECT_DIR = CMakeFiles/nlmp_bvp_test.dir
   OBJECT_FILE_DIR = CMakeFiles/nlmp_bvp_test.dir/src
 build CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o: CXX_COMPILER__nlmp_bvp_test ../src/nlmp_bvp_test.cpp || cmake_object_order_depends_target_nlmp_bvp_test
   DEP_FILE = CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o.d
   FLAGS = -g
-  INCLUDES = -I../include -I/home/shivanandvp/eigen
+  INCLUDES = -I../include -I/home/shivanandvp/eigen -I/home/shivanandvp/eigen/unsupported -I/home/shivanandvp/eigen/unsupported/test -I/home/shivanandvp/eigen/unsupported/test/mpreal
   OBJECT_DIR = CMakeFiles/nlmp_bvp_test.dir
   OBJECT_FILE_DIR = CMakeFiles/nlmp_bvp_test.dir/src
 
@@ -70,6 +70,7 @@ build CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o: CXX_COMPILER__nlmp_b
 build ../bin/nlmp_bvp_test: CXX_EXECUTABLE_LINKER__nlmp_bvp_test CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp.cpp.o CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o
   FLAGS = -g
   LINK_FLAGS = -rdynamic
+  LINK_LIBRARIES = -lgmpxx -lgmp -lmpfr
   OBJECT_DIR = CMakeFiles/nlmp_bvp_test.dir
   POST_BUILD = :
   PRE_LINK = :

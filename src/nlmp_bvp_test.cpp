@@ -1,3 +1,4 @@
+/*
 // Author: shivanandvp (shivanandvp.oss@gmail.com)
 
 // ===============================
@@ -6,18 +7,21 @@
 #include<iostream>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// For the cout statements
 #include<cmath>
 #include<nlmp_bvp.hpp>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For the function declarations
+#include <Eigen/MPRealSupport>
+using namespace mpfr;
 using namespace std;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** //
 using namespace Eigen;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  //
-using RowVectorXd = Matrix<double, 1, Dynamic>; // For the convenience of declaring row vectors
+using VectorXm = Matrix<mpreal, Dynamic, 1>;
+using RowVectorXm = Matrix<mpreal, 1, Dynamic>; // For the convenience of declaring row vectors
 // ===============================
 
 // ================
 // Functions dxBydt
 // ================
 // dxBydt = a function that defines the derivative of a state vector x at t -- (nx1)
-VectorXd dxBydt(double t, VectorXd x){ 
-***REMOVED*** // VectorXd dxdt(6);
-***REMOVED*** // double r = sqrt(pow(x(0),2) + pow(x(2),2) + pow(x(4),2));
+VectorXm dxBydt(mpreal t, VectorXm x){ 
+***REMOVED*** // VectorXm dxdt(6);
+***REMOVED*** // mpreal r = sqrt(pow(x(0),2) + pow(x(2),2) + pow(x(4),2));
 ***REMOVED*** // dxdt(0) = x(1);
 ***REMOVED*** // dxdt(1) = -x(0) / pow(r,3);
 ***REMOVED*** // dxdt(2) = x(3);
@@ -25,7 +29,7 @@ VectorXd dxBydt(double t, VectorXd x){
 ***REMOVED*** // dxdt(4) = x(5);
 ***REMOVED*** // dxdt(5) = -x(4) / pow(r,3);
 
-***REMOVED*** VectorXd dxdt(2);
+***REMOVED*** VectorXm dxdt(2);
 ***REMOVED*** dxdt(0) = x(1);
 ***REMOVED*** dxdt(1) = -fabs(x(0));
 
@@ -37,8 +41,8 @@ VectorXd dxBydt(double t, VectorXd x){
 // Functions BCResidues
 // ====================
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
-VectorXd BCResidues(MatrixXd xBC){
-***REMOVED*** // VectorXd residues(6);
+VectorXm BCResidues(MatrixXd xBC){
+***REMOVED*** // VectorXm residues(6);
 ***REMOVED*** // residues(0) = xBC(0,0) - 1.076;
 ***REMOVED*** // residues(1) = xBC(1,0) + pow(xBC(1,0),2) + xBC(1,1) + xBC(1,2) + xBC(1,3) + 2.053292953504164;
 ***REMOVED*** // residues(2) = xBC(2,0) + xBC(3,0) - 0.472283099142472;
@@ -46,7 +50,7 @@ VectorXd BCResidues(MatrixXd xBC){
 ***REMOVED*** // residues(4) = xBC(2,3) + xBC(4,3) - 1.57661; 
 ***REMOVED*** // residues(5) = xBC(5,3) + 0.03407297218269353;
 
-***REMOVED*** VectorXd residues(2);
+***REMOVED*** VectorXm residues(2);
 ***REMOVED*** residues(0) = xBC(0,0) - 0;
 ***REMOVED*** residues(1) = xBC(0,1) - 4;
 
@@ -63,14 +67,16 @@ int main(
 ***REMOVED*** char **argv // argv = an array of strings that are passed to  the program 
 ***REMOVED*** ){
 
+***REMOVED*** mpreal::set_default_prec(256);
+
 ***REMOVED*** cout<<endl;
 ***REMOVED*** cout<<"Program started..."<<endl;
 
 ***REMOVED*** // Variable declarations***REMOVED***
-***REMOVED*** // RowVectorXd t_BC(4);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
-***REMOVED*** // VectorXd oxt1(6);***REMOVED******REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
-***REMOVED*** VectorXd oxt1(2);
-***REMOVED*** RowVectorXd tBC(2);
+***REMOVED*** // RowVectorXm t_BC(4);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified -- (1xm)
+***REMOVED*** // VectorXm oxt1(6);***REMOVED******REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
+***REMOVED*** VectorXm oxt1(2);
+***REMOVED*** RowVectorXm tBC(2);
 ***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
@@ -125,3 +131,24 @@ int main(
 ***REMOVED*** return 0;
 }
 // =================
+*/
+
+#include <iostream>
+#include <Eigen/MPRealSupport>
+#include <Eigen/LU>
+using namespace mpfr;
+using namespace Eigen;
+int main()
+{
+  // set precision to 256 bits (double has only 53 bits)
+  mpreal::set_default_prec(256);
+  // Declare matrix and vector types with multi-precision scalar type
+  typedef Matrix<mpreal,Dynamic,Dynamic>  MatrixXmp;
+  typedef Matrix<mpreal,Dynamic,1>***REMOVED******REMOVED***  VectorXmp;
+  MatrixXmp A = MatrixXmp::Random(100,100);
+  VectorXmp b = VectorXmp::Random(100);
+  // Solve Ax=b using LU
+  VectorXmp x = A.lu().solve(b);
+  std::cout << "relative error: " << (A*x - b).norm() / b.norm() << std::endl;
+  return 0;
+}
