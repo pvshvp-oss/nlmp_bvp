@@ -40,22 +40,22 @@ BVPSolution<T> nlmpBVP(
 
 ***REMOVED******REMOVED***  // Variable declarations  
 ***REMOVED******REMOVED***  int omega = 0.5; 
-***REMOVED******REMOVED***  int j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // j***REMOVED******REMOVED******REMOVED***= the inner iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,n-1]
-***REMOVED******REMOVED***  int k;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // k***REMOVED******REMOVED******REMOVED***= the outer iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,Inf)
-***REMOVED******REMOVED***  int iCol;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // iCol***REMOVED******REMOVED***= the column index of the x solution for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- [0,nGrid-1]
-***REMOVED******REMOVED***  int iColP;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // iColP***REMOVED***  = the column index of the perturbed x solution for the IVP solver***REMOVED***
-***REMOVED******REMOVED***  T h;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // h***REMOVED******REMOVED******REMOVED***= the stepper step size for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,nGrid-1] 
-***REMOVED******REMOVED***  T t0;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // t0***REMOVED******REMOVED***  = the first boundary value of the independent variable
-***REMOVED******REMOVED***  T tm;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // tm***REMOVED******REMOVED***  = the last boundary value of the independent variable
-***REMOVED******REMOVED***  T kepsilonj;***REMOVED******REMOVED******REMOVED******REMOVED***// kepsilonj = the perturbation parameter for a state variable at a particular iteration k
-***REMOVED******REMOVED***  T kalpha;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// kalpha***REMOVED*** = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
-***REMOVED******REMOVED***  T kG;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // kG***REMOVED******REMOVED***  = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
-***REMOVED******REMOVED***  T kGPrev;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// kGPrev***REMOVED*** = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
+***REMOVED******REMOVED***  int j;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // j***REMOVED******REMOVED******REMOVED***= the inner iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,n-1]
+***REMOVED******REMOVED***  int k;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // k***REMOVED******REMOVED******REMOVED***= the outer iterating variable for IVAM***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,Inf)
+***REMOVED******REMOVED***  int iCol;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // iCol***REMOVED******REMOVED***= the column index of the x solution for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- [0,nGrid-1]
+***REMOVED******REMOVED***  int iColP;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // iColP***REMOVED***  = the column index of the perturbed x solution for the IVP solver***REMOVED***
+***REMOVED******REMOVED***  T h;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // h***REMOVED******REMOVED******REMOVED***= the stepper step size for the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- [0,nGrid-1] 
+***REMOVED******REMOVED***  T t0;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// t0***REMOVED******REMOVED***  = the first boundary value of the independent variable
+***REMOVED******REMOVED***  T tm;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// tm***REMOVED******REMOVED***  = the last boundary value of the independent variable
+***REMOVED******REMOVED***  T kepsilonj;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // kepsilonj = the perturbation parameter for a state variable at a particular iteration k
+***REMOVED******REMOVED***  T kalpha;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // kalpha***REMOVED*** = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
+***REMOVED******REMOVED***  T kG;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// kG***REMOVED******REMOVED***  = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
+***REMOVED******REMOVED***  T kGPrev;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // kGPrev***REMOVED*** = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
 ***REMOVED******REMOVED***  RowVectorXm<T> tSol(nGrid);***REMOVED***  // tSol***REMOVED******REMOVED***= the independent variable t over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (1xnGrid)
 ***REMOVED******REMOVED***  MatrixXm<T> xSol(n,nGrid);***REMOVED******REMOVED***// xSol***REMOVED******REMOVED***= the state vector x integrated over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nxnGrid)
 ***REMOVED******REMOVED***  RowVectorXm<T> tSolPert(nGrid); // tSolPert  = the independent variable t over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED******REMOVED***-- (1xnGrid)***REMOVED*** 
 ***REMOVED******REMOVED***  MatrixXm<T> xSolPert(n,nGrid);  // xSolPert  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED***-- (nxnGrid)
-***REMOVED******REMOVED***  RowVectorXi BCCols(m);***REMOVED******REMOVED*** // BCCols***REMOVED*** = the columns in the grid that correspond to boundary values***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
+***REMOVED******REMOVED***  RowVectorXi BCCols(m);***REMOVED******REMOVED******REMOVED*** // BCCols***REMOVED*** = the columns in the grid that correspond to boundary values***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED******REMOVED***  VectorXm<T> kxt1(n);***REMOVED******REMOVED******REMOVED******REMOVED***// kxt1***REMOVED******REMOVED***= the computed initial state vector in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx1)
 ***REMOVED******REMOVED***  VectorXm<T> kxt1Prev(n);***REMOVED******REMOVED***  // kxt1Prev  = the computed initial state vector in the previous (k-1)-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
 ***REMOVED******REMOVED***  VectorXm<T> kxt1P(n);***REMOVED******REMOVED******REMOVED***  // kxt1***REMOVED******REMOVED***= the computed perturbed initial state vector in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
@@ -72,7 +72,9 @@ BVPSolution<T> nlmpBVP(
 ***REMOVED******REMOVED***  h***REMOVED******REMOVED***= (tm - t0)/(nGrid-1);
 ***REMOVED******REMOVED***  BCCols = ((tBC-t0*RowVectorXm<T>::Ones(m))/h).template array().template round().template cast<int>();
 
-***REMOVED******REMOVED***  cout<<"Boundary nodes correspond to the below columns: "<<endl<<BCCols<<endl<<endl;
+***REMOVED******REMOVED***  if(ivamParameters.printDebug){
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Boundary nodes correspond to the below columns: "<<endl<<BCCols<<endl<<endl;
+***REMOVED******REMOVED***  }
 ***REMOVED******REMOVED***  
 ***REMOVED******REMOVED***  // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
 ***REMOVED******REMOVED***  auto dxBydtWrapper = [dxBydt] // Captured variables
@@ -114,13 +116,19 @@ BVPSolution<T> nlmpBVP(
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Adjust the relaxation parameter to control the rate of convergence
 ***REMOVED******REMOVED******REMOVED******REMOVED***if(kG < 0.01*kGPrev) {
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Increasing alpha..."<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** if(ivamParameters.printDebug){
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Increasing alpha..."<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kalpha = fmin(1.2*kalpha, 1.0); 
 ***REMOVED******REMOVED******REMOVED******REMOVED***} else if(kG >= kGPrev){
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Decreasing alpha..."<<endl;***REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** if(ivamParameters.printDebug){
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Decreasing alpha..."<<endl;***REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kalpha = 0.8*kalpha;***REMOVED******REMOVED***  
 ***REMOVED******REMOVED******REMOVED******REMOVED***} else{
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** if(ivamParameters.printDebug){
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Inner loop to perturb each state variable separately and find the normalized change in the boundary condition residues
@@ -160,12 +168,16 @@ BVPSolution<T> nlmpBVP(
 ***REMOVED******REMOVED******REMOVED******REMOVED***kG = kg.norm()/sqrt(n);
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***if(k >= 1000){
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** cout<<"[WARNING]: The solution did not converge after 1000 iterations. Terminating the process."<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** if(ivamParameters.printDebug){
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  cout<<"[WARNING]: The solution did not converge after 1000 iterations. Terminating the process."<<endl;
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** break;
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
 ***REMOVED******REMOVED***  }  
 
-***REMOVED******REMOVED***  cout<<"Ran "<<k<<" iteration(s)."<<endl;
+***REMOVED******REMOVED***  if(ivamParameters.printDebug){
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Ran "<<k<<" iteration(s)."<<endl;
+***REMOVED******REMOVED***  }
 
 ***REMOVED******REMOVED***  bvpSolution.t***REMOVED***= tSol;
 ***REMOVED******REMOVED***  bvpSolution.x***REMOVED***= xSol;
