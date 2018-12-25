@@ -20,7 +20,6 @@
 // Includes and global definitions
 // ===============================
 #include <iostream>                                    // For the cout statements
-#include <cmath>                                       // For the math functions
 #include "nlmp_bvp.hpp"                                // For the boundary value problem solver function declarations
 #include <Eigen/MPRealSupport>                         // For arbitrary precision computation
 using namespace std;                                   // For cout
@@ -54,6 +53,7 @@ VectorXm<mpreal> dxBydt(mpreal t, VectorXm<mpreal> x){
 // ====================
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
 VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBC){
+    
     /* Boundary Value Problem 1 */
     VectorXm<mpreal> residues(2);
     residues(0) = xBC(0,0) - 0;
@@ -89,8 +89,8 @@ int main(
     // Variable declarations   
 
     /* Boundary Value Problem 1 */
-    RowVectorXm<mpreal> tBC(2);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
-    VectorXm<mpreal>   oxt1(2);         // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+    RowVectorXm<mpreal> tBC(2);            // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    VectorXm<mpreal>   oxt1(2);            // oxt1           = column vector of the guessed initial state                                       -- (nx1)
 
     /* Boundary Value Problem 2 */
     // RowVectorXm<mpreal> tBC(3);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
