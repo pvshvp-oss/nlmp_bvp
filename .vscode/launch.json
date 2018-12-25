@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/nlmp_bvp_test",
+            "program": "${workspaceFolder}/bin/test_nlmpBVP",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

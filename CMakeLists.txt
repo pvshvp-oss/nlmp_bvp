@@ -4,43 +4,67 @@
 # ========================================
 
 # Set the minimum required cmake version
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.13)
 
 # Set the project name
-project(NLMP_BVP)
-
-# Set the include directories
-include_directories(
-    include
-    ~/eigen
-    ~/eigen/unsupported
-    ~/eigen/unsupported/test
-    ~/eigen/unsupported/test/mpreal
+project(
+    nlmpBVP       
+        VERSION 1.0.0 
+        LANGUAGES CXX 
     )
 
-# Set the source files
-file(GLOB SOURCES
-    "src/*"
+# create a list of files "execSources" to include in the target executable
+file(
+    GLOB_RECURSE execSources 
+        src/*.cpp    
     )
 
-# Set the output directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
-    ../bin
+# create a list of files "execHeaders" to include in the target executable
+file(
+    GLOB_RECURSE execHeaders 
+        include/*.hpp                  # add the header files
     )
 
-# Add an executable file to run, and specify the source files to use, to generate it
+# Add a target executable file to run, and specify the source files to use, to generate it
 add_executable(
-    nlmp_bvp_test ${SOURCES}
+    test_nlmpBVP   
+        ${execSources}
+        ${execHeaders}
     )
+
+# Set the include directories   
+target_include_directories(
+    test_nlmpBVP
+        PUBLIC
+            include
+        PRIVATE
+            ~/eigen
+            ~/eigen/unsupported
+            ~/eigen/unsupported/test
+            ~/eigen/unsupported/test/mpreal
+)
 
 # Set the directories to look for, for external libraries
-LINK_DIRECTORIES(
-    /usr/lib
+target_link_directories(
+    test_nlmpBVP
+        PRIVATE
+            /usr/lib
     )
 
 # Specify the external libraries to use, in order
-TARGET_LINK_LIBRARIES(nlmp_bvp_test
-    libgmpxx.so
-    libgmp.so
-    libmpfr.so
- )
+target_link_libraries(
+    test_nlmpBVP
+        libgmpxx.so
+        libgmp.so
+        libmpfr.so
+)
+
+# Set the output directory
+set_target_properties(
+    test_nlmpBVP
+        PROPERTIES
+            CMAKE_RUNTIME_OUTPUT_DIRECTORY
+                ../bin
+    )
+
+
