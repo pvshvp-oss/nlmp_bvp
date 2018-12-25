@@ -1,12 +1,6 @@
 [
 {
   "directory": "/home/shivanandvp/Development/nlmp_bvp/build",
-  "command": "/bin/g++***REMOVED***-I../include -I/home/shivanandvp/eigen -I/home/shivanandvp/eigen/unsupported -I/home/shivanandvp/eigen/unsupported/test -I/home/shivanandvp/eigen/unsupported/test/mpreal  -g***REMOVED***-o CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp.cpp.o -c /home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp.cpp",
-  "file": "/home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp.cpp"
-},
-
-{
-  "directory": "/home/shivanandvp/Development/nlmp_bvp/build",
   "command": "/bin/g++***REMOVED***-I../include -I/home/shivanandvp/eigen -I/home/shivanandvp/eigen/unsupported -I/home/shivanandvp/eigen/unsupported/test -I/home/shivanandvp/eigen/unsupported/test/mpreal  -g***REMOVED***-o CMakeFiles/nlmp_bvp_test.dir/src/nlmp_bvp_test.cpp.o -c /home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp_test.cpp",
   "file": "/home/shivanandvp/Development/nlmp_bvp/src/nlmp_bvp_test.cpp"
 }

@@ -19,31 +19,28 @@
 // ===============================
 // Includes and global definitions
 // ===============================
-#include<iostream>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// For the cout statements
-#include<cmath>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// For the math functions
-#include<Eigen/MPRealSupport>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // For arbitrary precision computation
-#include<nlmp_bvp.hpp>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For the boundary value problem solver function declarations
-using namespace mpfr;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// For arbitrary precision computation
-using namespace std;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // For cout
-using namespace Eigen;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For matrix and vector data types and operations
-using MatrixXm***REMOVED*** = Matrix<mpreal, Dynamic, Dynamic>; // Dynamic size matrix with the 'mpreal' data-type
-using VectorXm***REMOVED*** = Matrix<mpreal, Dynamic, 1>;***REMOVED******REMOVED*** // Dynamic size vector with the 'mpreal' data-type
-using RowVectorXm = Matrix<mpreal, 1, Dynamic>;***REMOVED******REMOVED*** // Dynamic size row vector with the 'mpreal' data-type
+#include <iostream>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// For the cout statements
+#include <cmath>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// For the math functions
+#include "nlmp_bvp.hpp"***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For the boundary value problem solver function declarations
+#include <Eigen/MPRealSupport>***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // For arbitrary precision computation
+using namespace std;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // For cout
+using namespace Eigen;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// For matrix and vector data types and operations
+using namespace mpfr;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // For arbitrary precision computation
 // ===============================
 
 // ================
 // Functions dxBydt
 // ================
 // dxBydt = a function that defines the derivative of a state vector x at t -- (nx1)
-VectorXm dxBydt(mpreal t, VectorXm x){ 
+VectorXm<mpreal> dxBydt(mpreal t, VectorXm<mpreal> x){ 
 
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** VectorXm dxdt(2);
+***REMOVED*** VectorXm<mpreal> dxdt(2);
 ***REMOVED*** dxdt(0) = x(1);
 ***REMOVED*** dxdt(1) = -fabs(x(0));
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** // VectorXm dxdt(3);
+***REMOVED*** // VectorXm<mpreal> dxdt(3);
 ***REMOVED*** // dxdt(0) = x(1);
 ***REMOVED*** // dxdt(1) = x(2);
 ***REMOVED*** // dxdt(2) = 25*x(1) - 1;
@@ -56,14 +53,14 @@ VectorXm dxBydt(mpreal t, VectorXm x){
 // Functions BCResidues
 // ====================
 // BCResidues = a function that defines the boundary condition residues at state vectors xBC -- (nx1) 
-VectorXm BCResidues(MatrixXm xBC){
+VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBC){
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** VectorXm residues(2);
+***REMOVED*** VectorXm<mpreal> residues(2);
 ***REMOVED*** residues(0) = xBC(0,0) - 0;
 ***REMOVED*** residues(1) = xBC(0,1) + 2;
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** // VectorXm residues(3);
+***REMOVED*** // VectorXm<mpreal> residues(3);
 ***REMOVED*** // residues(0) = xBC(1,0) - 0;
 ***REMOVED*** // residues(1) = xBC(1,2) - 0;
 ***REMOVED*** // residues(2) = xBC(0,1) - 0;
@@ -92,15 +89,15 @@ int main(
 ***REMOVED*** // Variable declarations***REMOVED***
 
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** RowVectorXm tBC(2);***REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
-***REMOVED*** VectorXm oxt1(2);***REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+***REMOVED*** RowVectorXm<mpreal> tBC(2);***REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
+***REMOVED*** VectorXm<mpreal>***REMOVED***oxt1(2);***REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** // RowVectorXm  tBC(3);***REMOVED******REMOVED******REMOVED***  // t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
-***REMOVED*** // VectorXm***REMOVED*** oxt1(3);***REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+***REMOVED*** // RowVectorXm<mpreal> tBC(3);***REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
+***REMOVED*** // VectorXm<mpreal>***REMOVED***oxt1(3);***REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 
-***REMOVED*** BVPSolution bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
-***REMOVED*** IVAMParameters ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
+***REMOVED*** BVPSolution<mpreal> bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
+***REMOVED*** IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
 
 ***REMOVED*** // Variable definitions
 
@@ -132,10 +129,10 @@ int main(
 ***REMOVED*** // Solve the boundary value problem
 
 ***REMOVED*** /* Boundary Value Problem 1 */
-***REMOVED*** bvpSolution = nlmp_bvp(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+***REMOVED*** bvpSolution = nlmp_bvp<mpreal>(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** // bvpSolution = nlmp_bvp(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+***REMOVED*** // bvpSolution = nlmp_bvp<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** cout<<endl<<"Done solving the BVP..."<<endl;
 
