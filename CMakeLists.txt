@@ -4,43 +4,67 @@
 # ========================================
 
 # Set the minimum required cmake version
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.13)
 
 # Set the project name
-project(NLMP_BVP)
-
-# Set the include directories
-include_directories(
-***REMOVED*** include
-***REMOVED*** ~/eigen
-***REMOVED*** ~/eigen/unsupported
-***REMOVED*** ~/eigen/unsupported/test
-***REMOVED*** ~/eigen/unsupported/test/mpreal
+project(
+***REMOVED*** nlmpBVP***REMOVED******REMOVED*** 
+***REMOVED******REMOVED***  VERSION 1.0.0 
+***REMOVED******REMOVED***  LANGUAGES CXX 
 ***REMOVED*** )
 
-# Set the source files
-file(GLOB SOURCES
-***REMOVED*** "src/*"
+# create a list of files "execSources" to include in the target executable
+file(
+***REMOVED*** GLOB_RECURSE execSources 
+***REMOVED******REMOVED***  src/*.cpp***REMOVED*** 
 ***REMOVED*** )
 
-# Set the output directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
-***REMOVED*** ../bin
+# create a list of files "execHeaders" to include in the target executable
+file(
+***REMOVED*** GLOB_RECURSE execHeaders 
+***REMOVED******REMOVED***  include/*.hpp***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***# add the header files
 ***REMOVED*** )
 
-# Add an executable file to run, and specify the source files to use, to generate it
+# Add a target executable file to run, and specify the source files to use, to generate it
 add_executable(
-***REMOVED*** nlmp_bvp_test ${SOURCES}
+***REMOVED*** test_nlmpBVP***REMOVED***
+***REMOVED******REMOVED***  ${execSources}
+***REMOVED******REMOVED***  ${execHeaders}
 ***REMOVED*** )
+
+# Set the include directories***REMOVED***
+target_include_directories(
+***REMOVED*** test_nlmpBVP
+***REMOVED******REMOVED***  PUBLIC
+***REMOVED******REMOVED******REMOVED******REMOVED***include
+***REMOVED******REMOVED***  PRIVATE
+***REMOVED******REMOVED******REMOVED******REMOVED***~/eigen
+***REMOVED******REMOVED******REMOVED******REMOVED***~/eigen/unsupported
+***REMOVED******REMOVED******REMOVED******REMOVED***~/eigen/unsupported/test
+***REMOVED******REMOVED******REMOVED******REMOVED***~/eigen/unsupported/test/mpreal
+)
 
 # Set the directories to look for, for external libraries
-LINK_DIRECTORIES(
-***REMOVED*** /usr/lib
+target_link_directories(
+***REMOVED*** test_nlmpBVP
+***REMOVED******REMOVED***  PRIVATE
+***REMOVED******REMOVED******REMOVED******REMOVED***/usr/lib
 ***REMOVED*** )
 
 # Specify the external libraries to use, in order
-TARGET_LINK_LIBRARIES(nlmp_bvp_test
-***REMOVED*** libgmpxx.so
-***REMOVED*** libgmp.so
-***REMOVED*** libmpfr.so
- )
+target_link_libraries(
+***REMOVED*** test_nlmpBVP
+***REMOVED******REMOVED***  libgmpxx.so
+***REMOVED******REMOVED***  libgmp.so
+***REMOVED******REMOVED***  libmpfr.so
+)
+
+# Set the output directory
+set_target_properties(
+***REMOVED*** test_nlmpBVP
+***REMOVED******REMOVED***  PROPERTIES
+***REMOVED******REMOVED******REMOVED******REMOVED***CMAKE_RUNTIME_OUTPUT_DIRECTORY
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** ../bin
+***REMOVED*** )
+
+
