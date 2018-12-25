@@ -20,7 +20,7 @@
 // Includes and global definitions
 // ===============================
 #include <iostream>                                    // For the cout statements
-#include "nlmpbvp.hpp"                                // For the boundary value problem solver function declarations
+#include "nlmpbvp.hpp"                                 // For the boundary value problem solver function declarations
 #include <Eigen/MPRealSupport>                         // For arbitrary precision computation
 using namespace std;                                   // For cout
 using namespace Eigen;                                 // For matrix and vector data types and operations
@@ -34,15 +34,15 @@ using namespace mpfr;                                  // For arbitrary precisio
 VectorXm<mpreal> dxBydt(mpreal t, VectorXm<mpreal> x){ 
 
     /* Boundary Value Problem 1 */
-    VectorXm<mpreal> dxdt(2);
-    dxdt(0) = x(1);
-    dxdt(1) = -fabs(x(0));
+    // VectorXm<mpreal> dxdt(2);
+    // dxdt(0) = x(1);
+    // dxdt(1) = -fabs(x(0));
 
     /* Boundary Value Problem 2 */
-    // VectorXm<mpreal> dxdt(3);
-    // dxdt(0) = x(1);
-    // dxdt(1) = x(2);
-    // dxdt(2) = 25*x(1) - 1;
+    VectorXm<mpreal> dxdt(3);
+    dxdt(0) = x(1);
+    dxdt(1) = x(2);
+    dxdt(2) = 25*x(1) - 1;
 
     return dxdt;
 }
@@ -55,15 +55,15 @@ VectorXm<mpreal> dxBydt(mpreal t, VectorXm<mpreal> x){
 VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBC){
     
     /* Boundary Value Problem 1 */
-    VectorXm<mpreal> residues(2);
-    residues(0) = xBC(0,0) - 0;
-    residues(1) = xBC(0,1) + 2;
+    // VectorXm<mpreal> residues(2);
+    // residues(0) = xBC(0,0) - 0;
+    // residues(1) = xBC(0,1) + 2;
 
     /* Boundary Value Problem 2 */
-    // VectorXm<mpreal> residues(3);
-    // residues(0) = xBC(1,0) - 0;
-    // residues(1) = xBC(1,2) - 0;
-    // residues(2) = xBC(0,1) - 0;
+    VectorXm<mpreal> residues(3);
+    residues(0) = xBC(1,0) - 0;
+    residues(1) = xBC(1,2) - 0;
+    residues(2) = xBC(0,1) - 0;
 
     return residues;
 }
@@ -78,7 +78,7 @@ int main(
     char **argv // argv = an array of strings that are passed to  the program 
     ){
 
-    mpreal::set_default_prec(256); // Set the number of digits of precision you want for computations
+    mpreal::set_default_prec(64); // Set the number of digits of precision you want for computations
 
     cout<<endl;
     cout<<"===================================================================="<<endl;
@@ -89,12 +89,12 @@ int main(
     // Variable declarations   
 
     /* Boundary Value Problem 1 */
-    RowVectorXm<mpreal> tBC(2);            // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
-    VectorXm<mpreal>   oxt1(2);            // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+    // RowVectorXm<mpreal> tBC(2);            // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    // VectorXm<mpreal>   oxt1(2);            // oxt1           = column vector of the guessed initial state                                       -- (nx1)
 
     /* Boundary Value Problem 2 */
-    // RowVectorXm<mpreal> tBC(3);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
-    // VectorXm<mpreal>   oxt1(3);         // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+    RowVectorXm<mpreal> tBC(3);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    VectorXm<mpreal>   oxt1(3);         // oxt1           = column vector of the guessed initial state                                       -- (nx1)
 
     BVPSolution<mpreal> bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -102,24 +102,25 @@ int main(
     // Variable definitions
 
     /* Boundary Value Problem 1 */
-    tBC  << 0.0, 4.0;               // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-    oxt1 <<  1,                     // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
-             0;  
+    // tBC  << 0.0, 4.0;               // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    // oxt1 <<  1,                     // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
+            //  0;  
     // tBC  << 0.0, 4.0;               // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
     // oxt1 << -1,                     // oxt1 = column vector of the guessed initial state                                        -- (nx1) 
     //          0;
 
     /* Boundary Value Problem 2 */
-    // tBC  << 0.0, 0.5, 1.0;          // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-    // oxt1 << 1,                      // oxt1 = column vector of the guessed initial state                                        -- (nx1)
-    //         1,
-    //         1;
+    tBC  << 0.0, 0.5, 1.0;          // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    oxt1 << 1,                      // oxt1 = column vector of the guessed initial state                                        -- (nx1)
+            1,
+            1;
    
     // Assign the parameters for IVAM
-    ivamParameters.EPSILON = 1e-10; // EPSILON = the state perturbation parameter to probe the differential equation system with
-    ivamParameters.ALPHA   = 1.0;   // ALPHA   = the relaxation factor to scale the adjustment to the initial condition
-    ivamParameters.SIGMA   = 1e-14; // SIGMA   = the tolerance for error outside which the solver needs to  iterate further. 
-    ivamParameters.BETA    = 1e-3;  // BETA    = the deflation factor
+    ivamParameters.EPSILON    = 1e-10; // EPSILON    = the state perturbation parameter to probe the differential equation system with
+    ivamParameters.ALPHA      = 1.0;   // ALPHA      = the relaxation factor to scale the adjustment to the initial condition
+    ivamParameters.SIGMA      = 1e-14; // SIGMA      = the tolerance for error outside which the solver needs to  iterate further. 
+    ivamParameters.BETA       = 1e-3;  // BETA       = the deflation factor
+    ivamParameters.printDebug = true; // printDebug = specify whether debug messages should be output to the console
 
     cout<<endl<<"Boundary nodes (tBC) = "<<endl<<tBC<<endl;
     cout<<endl<<"Starting state vector (oxt1) = "<<endl<<oxt1<<endl;
@@ -129,10 +130,10 @@ int main(
     // Solve the boundary value problem
 
     /* Boundary Value Problem 1 */
-    bvpSolution = nlmpBVP<mpreal>(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+    // bvpSolution = nlmpBVP<mpreal>(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     /* Boundary Value Problem 2 */
-    // bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+    bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     cout<<endl<<"Done solving the BVP..."<<endl;
 

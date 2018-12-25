@@ -40,22 +40,22 @@ BVPSolution<T> nlmpBVP(
 
         // Variable declarations  
         int omega = 0.5; 
-        int j;                       // j         = the inner iterating variable for IVAM                                                              -- [0,n-1]
-        int k;                       // k         = the outer iterating variable for IVAM                                                              -- [0,Inf)
-        int iCol;                    // iCol      = the column index of the x solution for the IVP solver                                              -- [0,nGrid-1]
-        int iColP;                   // iColP     = the column index of the perturbed x solution for the IVP solver   
-        T h;                    // h         = the stepper step size for the IVP solver                                                           -- [0,nGrid-1] 
-        T t0;                   // t0        = the first boundary value of the independent variable
-        T tm;                   // tm        = the last boundary value of the independent variable
-        T kepsilonj;            // kepsilonj = the perturbation parameter for a state variable at a particular iteration k
-        T kalpha;               // kalpha    = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
-        T kG;                   // kG        = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
-        T kGPrev;               // kGPrev    = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
+        int j;                          // j         = the inner iterating variable for IVAM                                                              -- [0,n-1]
+        int k;                          // k         = the outer iterating variable for IVAM                                                              -- [0,Inf)
+        int iCol;                       // iCol      = the column index of the x solution for the IVP solver                                              -- [0,nGrid-1]
+        int iColP;                      // iColP     = the column index of the perturbed x solution for the IVP solver   
+        T h;                            // h         = the stepper step size for the IVP solver                                                           -- [0,nGrid-1] 
+        T t0;                           // t0        = the first boundary value of the independent variable
+        T tm;                           // tm        = the last boundary value of the independent variable
+        T kepsilonj;                    // kepsilonj = the perturbation parameter for a state variable at a particular iteration k
+        T kalpha;                       // kalpha    = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
+        T kG;                           // kG        = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
+        T kGPrev;                       // kGPrev    = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
         RowVectorXm<T> tSol(nGrid);     // tSol      = the independent variable t over the whole grid in the solution of the IVP solver                   -- (1xnGrid)
         MatrixXm<T> xSol(n,nGrid);      // xSol      = the state vector x integrated over the whole grid in the solution of the IVP solver                -- (nxnGrid)
         RowVectorXm<T> tSolPert(nGrid); // tSolPert  = the independent variable t over the whole grid in the perturbed solution of the IVP solver         -- (1xnGrid)    
         MatrixXm<T> xSolPert(n,nGrid);  // xSolPert  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
-        RowVectorXi BCCols(m);       // BCCols    = the columns in the grid that correspond to boundary values                                         -- (1xm)
+        RowVectorXi BCCols(m);          // BCCols    = the columns in the grid that correspond to boundary values                                         -- (1xm)
         VectorXm<T> kxt1(n);            // kxt1      = the computed initial state vector in the k-th iteration                                            -- (nx1)
         VectorXm<T> kxt1Prev(n);        // kxt1Prev  = the computed initial state vector in the previous (k-1)-th iteration                               -- (nx1)
         VectorXm<T> kxt1P(n);           // kxt1      = the computed perturbed initial state vector in the k-th iteration                                  -- (nx1)
@@ -72,7 +72,9 @@ BVPSolution<T> nlmpBVP(
         h      = (tm - t0)/(nGrid-1);
         BCCols = ((tBC-t0*RowVectorXm<T>::Ones(m))/h).template array().template round().template cast<int>();
 
-        cout<<"Boundary nodes correspond to the below columns: "<<endl<<BCCols<<endl<<endl;
+        if(ivamParameters.printDebug){
+            cout<<"Boundary nodes correspond to the below columns: "<<endl<<BCCols<<endl<<endl;
+        }
         
         // Wrapper function to be called by the IVP solver to retrieve the definitions for the differential equations
         auto dxBydtWrapper = [dxBydt] // Captured variables
@@ -114,13 +116,19 @@ BVPSolution<T> nlmpBVP(
 
             // Adjust the relaxation parameter to control the rate of convergence
             if(kG < 0.01*kGPrev) {
-                cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Increasing alpha..."<<endl;
+                if(ivamParameters.printDebug){
+                    cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Increasing alpha..."<<endl;
+                }
                 kalpha = fmin(1.2*kalpha, 1.0); 
             } else if(kG >= kGPrev){
-                cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Decreasing alpha..."<<endl;             
+                if(ivamParameters.printDebug){
+                    cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<" Decreasing alpha..."<<endl;             
+                }
                 kalpha = 0.8*kalpha;        
             } else{
-                cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<endl;
+                if(ivamParameters.printDebug){
+                    cout<<"k = "<<k<<"... kG = "<<kG<<"... kGPrev = "<<kGPrev<<" alpha = "<<kalpha<<endl;
+                }
             }
 
             // Inner loop to perturb each state variable separately and find the normalized change in the boundary condition residues
@@ -160,12 +168,16 @@ BVPSolution<T> nlmpBVP(
             kG = kg.norm()/sqrt(n);
 
             if(k >= 1000){
-                cout<<"[WARNING]: The solution did not converge after 1000 iterations. Terminating the process."<<endl;
+                if(ivamParameters.printDebug){
+                    cout<<"[WARNING]: The solution did not converge after 1000 iterations. Terminating the process."<<endl;
+                }
                 break;
             }
         }  
 
-        cout<<"Ran "<<k<<" iteration(s)."<<endl;
+        if(ivamParameters.printDebug){
+            cout<<"Ran "<<k<<" iteration(s)."<<endl;
+        }
 
         bvpSolution.t   = tSol;
         bvpSolution.x   = xSol;
