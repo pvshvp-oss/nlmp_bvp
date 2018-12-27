@@ -92,6 +92,8 @@ VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBCL, MatrixXm<mpreal> xBCR){
 ***REMOVED*** residues(7) = xBCR(1,2) - xBCL(1,3) - (sqrt(3)-1);
 ***REMOVED*** residues(8) = xBCR(0,3) - xBCL(0,4) - 0;
 ***REMOVED*** residues(9) = xBCR(1,3) - xBCL(1,4) - 0;
+
+***REMOVED*** return residues;
 }
 
 
@@ -124,7 +126,7 @@ int main(
 
 ***REMOVED*** /* Boundary Value Problem 3 */
 ***REMOVED*** RowVectorXm<mpreal> tBC(6);
-***REMOVED*** VectorXm<mpreal>***REMOVED***oxt1(2); 
+***REMOVED*** VectorXm<mpreal>***REMOVED***oxt1(10); 
 
 ***REMOVED*** BVPSolution<mpreal> bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -157,7 +159,7 @@ int main(
 ***REMOVED******REMOVED******REMOVED******REMOVED*** 2.1,
 ***REMOVED******REMOVED******REMOVED******REMOVED*** 0.9,
 ***REMOVED******REMOVED******REMOVED******REMOVED*** 0.8;
-***REMOVED******REMOVED******REMOVED******REMOVED*** 
+
 ***REMOVED*** // Assign the parameters for IVAM
 ***REMOVED*** ivamParameters.EPSILON***REMOVED*** = 1e-10; // EPSILON***REMOVED*** = the state perturbation parameter to probe the differential equation system with
 ***REMOVED*** ivamParameters.ALPHA***REMOVED******REMOVED***= 1.0;***REMOVED***// ALPHA***REMOVED******REMOVED***= the relaxation factor to scale the adjustment to the initial condition
@@ -176,7 +178,10 @@ int main(
 ***REMOVED*** // bvpSolution = nlmpBVP<mpreal>(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+***REMOVED*** // bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+
+***REMOVED*** /* Boundary Value Problem 3 */
+***REMOVED*** bvpSolution = nlmpBVP2<mpreal>(2, 6, 12*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** cout<<endl<<"Done solving the BVP..."<<endl;
 
