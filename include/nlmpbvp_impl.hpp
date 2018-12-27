@@ -309,7 +309,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 
             kalpha = 1;
             // Solve the linarized adjusting equation            
-            kxt1 = kxt1 - Map<MatrixXm<T>>(kS.colPivHouseholderQr().solve(kalpha*kg).data(),n,m-1);
+            kxt1 = kxt1 - Map<MatrixXm<T>>((kS.colPivHouseholderQr().solve(kalpha*kg)).template data(),n,m-1);
 
             // Start the next iteration
             kGPrev = kG;
