@@ -2,6 +2,7 @@
 // Author: shivanandvp 
 // Email : shivanandvp.oss@gmail.com
 // ========================================
+// Copyright shivanandvp (shivanandvp.oss@gmail.com)
 
 // ========================
 // Structure IVAMParameters

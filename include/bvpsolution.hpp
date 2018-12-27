@@ -2,6 +2,7 @@
 // Author: shivanandvp 
 // Email : shivanandvp.oss@gmail.com
 // ========================================
+// Copyright shivanandvp (shivanandvp.oss@gmail.com)
 
 // ===============================
 // Includes and global definitions
@@ -18,9 +19,9 @@ using RowVectorXi = Matrix<int, 1, Dynamic>;***REMOVED******REMOVED******REMOVED
 // Structure BVPSolution
 // =====================
 template <typename T> struct BVPSolution{
-***REMOVED*** RowVectorXm<T>***REMOVED***t; // t***REMOVED*** = row vector of values at which state vectors x are evaluated***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (1xnGrid)
-***REMOVED*** MatrixXm<T>***REMOVED******REMOVED***x; // x***REMOVED*** = state vectors at all grid points t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nxnGrid)  
-***REMOVED*** RowVectorXm<T> tBC; // tBC = row vector of boundary condition values at which state vectors xBC are evaluated -- (1xm)***REMOVED***
-***REMOVED*** MatrixXm<T>***REMOVED*** xBC; // xBC = state vectors at boundary conditions tBC***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nxm)
+***REMOVED*** RowVectorXm<T>***REMOVED***t; // t***REMOVED*** = row vector of values at which state vectors x are evaluated***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (1xnGrid)
+***REMOVED*** MatrixXm<T>***REMOVED******REMOVED***x; // x***REMOVED*** = state vectors at all grid points t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nxnGrid)  
+***REMOVED*** RowVectorXm<T> tBC; // tBC  = row vector of boundary condition values at which state vectors xBC are evaluated -- (1xm)***REMOVED***
+***REMOVED*** MatrixXm<T>***REMOVED*** xBC; // xBC  = state vectors at boundary conditions tBC***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (nxm)
 };
 // =====================
