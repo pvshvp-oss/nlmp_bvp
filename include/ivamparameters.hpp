@@ -2,6 +2,7 @@
 // Author: Shivanand Pattanshetti 
 // Email : shivanand.pattanshetti@gmail.com
 // ========================================
+// Copyright Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
 
 // ========================
 // Structure IVAMParameters

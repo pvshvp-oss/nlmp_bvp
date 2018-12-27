@@ -2,6 +2,7 @@
 // Author: Shivanand Pattanshetti 
 // Email : shivanand.pattanshetti@gmail.com
 // ========================================
+// Copyright Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
 
 // ===============================
 // Includes and global definitions
@@ -190,11 +191,11 @@ template <typename T> BVPSolution<T> nlmpBVP2(
     int n,                                     // n              = the number of differential equations = the number of boundary conditions
     int m,                                     // m              = the number of nodes at which boundary conditions are specified
     int nGrid,                                 // nGrid          = the number of points at which the state can be evaluated
-    RowVectorXm<T> tBC,                        // tBC            = row vector of values at which boundary conditions are specified               -- (1xm)
-    MatrixXm<T> oxt1,                          // oxt1           = matrix of the guessed initial state                                           -- (nx(m-1))    
-    VectorXm<T> dxBydt(T t, VectorXm<T> x),    // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
-    VectorXm<T> BCResidues(MatrixXm<T> xBCL,   // BCResidues     = a function that defines the boundary condition residues...
-                           MatrixXm<T> xBCR),  //                  ...at the left and right state vectors xBCL and xBCR                          -- (n(m-1)x1)      
+    RowVectorXm<T> tBC,                        // tBC            = row vector of values at which boundary conditions are specified                       -- (1xm)
+    MatrixXm<T> oxt1,                          // oxt1           = matrix of the guessed initial state                                                   -- (nx(m-1))    
+    VectorXm<T> dxBydt(T t, VectorXm<T> x),    // dxBydt         = a function that defines the derivative of a state vector x at t                       -- (nx1)
+    VectorXm<T> BCResidues(MatrixXm<T> xBCL,   // BCResidues     = a function that defines the boundary condition residues at the nodal state vectors... -- (n(m-1)x1)
+                           MatrixXm<T> xBCR),  //                    ... on the left and right side of integration intervals, xBCL and xBCR     
     IVAMParameters<T> ivamParameters           // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
     ){  
 

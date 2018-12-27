@@ -2,6 +2,7 @@
 // Author: Shivanand Pattanshetti 
 // Email : shivanand.pattanshetti@gmail.com
 // ========================================
+// Copyright Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
 
 // ===============================
 // Includes and global definitions
@@ -18,9 +19,9 @@ using RowVectorXi = Matrix<int, 1, Dynamic>;                        // Dynamic s
 // Structure BVPSolution
 // =====================
 template <typename T> struct BVPSolution{
-    RowVectorXm<T>   t; // t    = row vector of values at which state vectors x are evaluated                     -- (1xnGrid)
-    MatrixXm<T>      x; // x    = state vectors at all grid points t                                              -- (nxnGrid)  
-    RowVectorXm<T> tBC; // tBC = row vector of boundary condition values at which state vectors xBC are evaluated -- (1xm)   
-    MatrixXm<T>    xBC; // xBC = state vectors at boundary conditions tBC                                         -- (nxm)
+    RowVectorXm<T>   t; // t    = row vector of values at which state vectors x are evaluated                      -- (1xnGrid)
+    MatrixXm<T>      x; // x    = state vectors at all grid points t                                               -- (nxnGrid)  
+    RowVectorXm<T> tBC; // tBC  = row vector of boundary condition values at which state vectors xBC are evaluated -- (1xm)   
+    MatrixXm<T>    xBC; // xBC  = state vectors at boundary conditions tBC                                         -- (nxm)
 };
 // =====================
