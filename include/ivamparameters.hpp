@@ -4,6 +4,14 @@
 // ========================================
 // Copyright shivanandvp (shivanandvp.oss@gmail.com)
 
+// ==========
+// References
+// ==========
+// [1] Ojika, T., and Y. Kasue. "Initial-value adjusting method for the solution of nonlinear multipoint boundary-value problems."
+//***REMOVED***  Journal of Mathematical Analysis and Applications 69.2 (1979): 359-371.
+// [2] Welsh, Wayne, and Takeo Ojika. "Multipoint boundary value problems with discontinuities I. Algorithms and applications."
+//***REMOVED***  Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.
+
 // ========================
 // Structure IVAMParameters
 // ========================

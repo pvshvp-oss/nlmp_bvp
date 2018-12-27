@@ -4,6 +4,14 @@
 // ========================================
 // Copyright shivanandvp (shivanandvp.oss@gmail.com)
 
+// ==========
+// References
+// ==========
+// [1] Ojika, T., and Y. Kasue. "Initial-value adjusting method for the solution of nonlinear multipoint boundary-value problems."
+//***REMOVED***  Journal of Mathematical Analysis and Applications 69.2 (1979): 359-371.
+// [2] Welsh, Wayne, and Takeo Ojika. "Multipoint boundary value problems with discontinuities I. Algorithms and applications."
+//***REMOVED***  Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.
+
 // ============================
 // Credits for example problems
 // ============================
@@ -117,9 +125,9 @@ int main(
 ***REMOVED*** mpreal::set_default_prec(64); // Set the number of digits of precision you want for computations
 
 ***REMOVED*** cout<<endl;
-***REMOVED*** cout<<"===================================================================="<<endl;
-***REMOVED*** cout<<"Test: Non-linear multipoint boundary value problem solver (nlmpBVP)"<<endl;
-***REMOVED*** cout<<"===================================================================="<<endl;
+***REMOVED*** cout<<"============================================================================="<<endl;
+***REMOVED*** cout<<"Test: Non-linear multipoint boundary value problem solver (nlmpBVP, nlmpBVP2)"<<endl;
+***REMOVED*** cout<<"============================================================================="<<endl;
 ***REMOVED*** cout<<"Copyright shivanandvp (shivanandvp.oss@gmail.com)"<<endl;
 
 ***REMOVED*** // Variable declarations***REMOVED***
