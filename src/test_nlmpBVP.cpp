@@ -39,10 +39,15 @@ VectorXm<mpreal> dxBydt(mpreal t, VectorXm<mpreal> x){
     // dxdt(1) = -fabs(x(0));
 
     /* Boundary Value Problem 2 */
-    VectorXm<mpreal> dxdt(3);
-    dxdt(0) = x(1);
-    dxdt(1) = x(2);
-    dxdt(2) = 25*x(1) - 1;
+    // VectorXm<mpreal> dxdt(3);
+    // dxdt(0) = x(1);
+    // dxdt(1) = x(2);
+    // dxdt(2) = 25*x(1) - 1;
+
+    /* Boundary Value Problem 3 */
+    VectorXm<mpreal> dxdt(2);
+    dxdt(0) =  x(1);
+    dxdt(1) = -x(0);
 
     return dxdt;
 }
@@ -69,6 +74,27 @@ VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBC){
 }
 // ===================
 
+// ====================
+// Functions BCResidues
+// ====================
+// BCResidues     = a function that defines the boundary condition residues...  -- (n(m-1)x1)
+//                  ...at the left and right state vectors xBCL and xBCR
+VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBCL, MatrixXm<mpreal> xBCR){
+    /* Boundary Value Problem 3 */
+    VectorXm<mpreal> residues(10);
+    residues(0) = xBCL(0,0)-0;
+    residues(1) = xBCL(1,4)-0;
+    residues(2) = xBCR(0,0) - xBCL(0,1) - 1;
+    residues(3) = xBCR(1,0) - xBCL(1,1) - 0;
+    residues(4) = xBCR(1,1) - xBCL(1,2) + 1;
+    residues(5) = xBCR(0,1) - xBCL(0,2) + 0;
+    residues(6) = xBCR(0,2) - xBCL(0,3) - 1;
+    residues(7) = xBCR(1,2) - xBCL(1,3) - (sqrt(3)-1);
+    residues(8) = xBCR(0,3) - xBCL(0,4) - 0;
+    residues(9) = xBCR(1,3) - xBCL(1,4) - 0;
+}
+
+
 // =================
 // The main function
 // =================
@@ -93,8 +119,12 @@ int main(
     // VectorXm<mpreal>   oxt1(2);            // oxt1           = column vector of the guessed initial state                                       -- (nx1)
 
     /* Boundary Value Problem 2 */
-    RowVectorXm<mpreal> tBC(3);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
-    VectorXm<mpreal>   oxt1(3);         // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+    // RowVectorXm<mpreal> tBC(3);         // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    // VectorXm<mpreal>   oxt1(3);         // oxt1           = column vector of the guessed initial state                                       -- (nx1)
+
+    /* Boundary Value Problem 3 */
+    RowVectorXm<mpreal> tBC(6);
+    VectorXm<mpreal>   oxt1(2); 
 
     BVPSolution<mpreal> bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -110,11 +140,24 @@ int main(
     //          0;
 
     /* Boundary Value Problem 2 */
-    tBC  << 0.0, 0.5, 1.0;          // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-    oxt1 << 1,                      // oxt1 = column vector of the guessed initial state                                        -- (nx1)
-            1,
-            1;
-   
+    // tBC  << 0.0, 0.5, 1.0;          // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    // oxt1 << 1,                      // oxt1 = column vector of the guessed initial state                                        -- (nx1)
+    //         1,
+    //         1;
+
+    /* Boundary Value Problem 3 */
+    tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
+    oxt1 <<  0.1,
+            -0.6,
+             0.1,
+             0.1,
+             0.4,
+             0.9,
+             0.8,
+             2.1,
+             0.9,
+             0.8;
+             
     // Assign the parameters for IVAM
     ivamParameters.EPSILON    = 1e-10; // EPSILON    = the state perturbation parameter to probe the differential equation system with
     ivamParameters.ALPHA      = 1.0;   // ALPHA      = the relaxation factor to scale the adjustment to the initial condition
