@@ -163,8 +163,12 @@ int main(
 ***REMOVED*** // VectorXm<mpreal>***REMOVED***oxt1(3);***REMOVED******REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 
 ***REMOVED*** /* Boundary Value Problem 3 */
-***REMOVED*** RowVectorXm<mpreal> tBC(6);
-***REMOVED*** MatrixXm<mpreal>***REMOVED***oxt1(2,5); 
+***REMOVED*** // RowVectorXm<mpreal> tBC(6);***REMOVED******REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)  
+***REMOVED*** // MatrixXm<mpreal> oxt1(2,5);***REMOVED******REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = matrix of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx(m-1))
+
+***REMOVED*** /* Boundary Value Problem 4 */
+***REMOVED*** RowVectorXm<mpreal> tBC(5);***REMOVED******REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
+***REMOVED*** MatrixXm<mpreal> oxt1(2,4);***REMOVED******REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = matrix of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx(m-1))
 
 ***REMOVED*** BVPSolution<mpreal> bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -186,11 +190,18 @@ int main(
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED***1;
 
 ***REMOVED*** /* Boundary Value Problem 3 */
+***REMOVED*** // // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+***REMOVED*** // tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
+***REMOVED*** // // oxt1 = a matrix of the guessed initial state on the left side of each integration interval***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx(m-1))
+***REMOVED*** // oxt1 <<  0.1, 0.1, 0.4, 0.8, 0.9,
+***REMOVED*** //***REMOVED******REMOVED******REMOVED***-0.6, 0.1, 0.9, 2.1, 0.8;
+
+***REMOVED*** /* Boundary Value Problem 4 */
 ***REMOVED*** // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-***REMOVED*** tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
+***REMOVED*** tBC  << 0.0, mpfr::const_pi()/4, mpfr::const_pi()/2, 3*mpfr::const_pi()/4, mpfr::const_pi();
 ***REMOVED*** // oxt1 = a matrix of the guessed initial state on the left side of each integration interval***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx(m-1))
-***REMOVED*** oxt1 <<  0.1, 0.1, 0.4, 0.8, 0.9,
-***REMOVED******REMOVED******REMOVED******REMOVED***-0.6, 0.1, 0.9, 2.1, 0.8;
+***REMOVED*** oxt1 << -0.1, 0.7, 0.1,-0.7,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 1.1, 0.7,-1.1,-0.7;
 
 ***REMOVED*** // Assign the parameters for IVAM
 ***REMOVED*** ivamParameters.EPSILON***REMOVED*** = 1e-10; // EPSILON***REMOVED*** = the state perturbation parameter to probe the differential equation system with
@@ -213,7 +224,10 @@ int main(
 ***REMOVED*** // bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** /* Boundary Value Problem 3 */
-***REMOVED*** bvpSolution = nlmpBVP2<mpreal>(2, 6, 12*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+***REMOVED*** // bvpSolution = nlmpBVP2<mpreal>(2, 6, 12*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+
+***REMOVED*** /* Boundary Value Problem 4 */
+***REMOVED*** bvpSolution = nlmpBVP2<mpreal>(2, 5, 10*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
 ***REMOVED*** cout<<endl<<"Done solving the BVP..."<<endl;
 
