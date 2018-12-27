@@ -92,6 +92,8 @@ VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBCL, MatrixXm<mpreal> xBCR){
     residues(7) = xBCR(1,2) - xBCL(1,3) - (sqrt(3)-1);
     residues(8) = xBCR(0,3) - xBCL(0,4) - 0;
     residues(9) = xBCR(1,3) - xBCL(1,4) - 0;
+
+    return residues;
 }
 
 
@@ -124,7 +126,7 @@ int main(
 
     /* Boundary Value Problem 3 */
     RowVectorXm<mpreal> tBC(6);
-    VectorXm<mpreal>   oxt1(2); 
+    VectorXm<mpreal>   oxt1(10); 
 
     BVPSolution<mpreal> bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -157,7 +159,7 @@ int main(
              2.1,
              0.9,
              0.8;
-             
+
     // Assign the parameters for IVAM
     ivamParameters.EPSILON    = 1e-10; // EPSILON    = the state perturbation parameter to probe the differential equation system with
     ivamParameters.ALPHA      = 1.0;   // ALPHA      = the relaxation factor to scale the adjustment to the initial condition
@@ -176,7 +178,10 @@ int main(
     // bvpSolution = nlmpBVP<mpreal>(2, 2, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     /* Boundary Value Problem 2 */
-    bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+    // bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+
+    /* Boundary Value Problem 3 */
+    bvpSolution = nlmpBVP2<mpreal>(2, 6, 12*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     cout<<endl<<"Done solving the BVP..."<<endl;
 

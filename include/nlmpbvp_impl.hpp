@@ -188,8 +188,7 @@ template <typename T> BVPSolution<T> nlmpBVP(
 // ===================
 template <typename T> BVPSolution<T> nlmpBVP2(
     int n,                                     // n              = the number of differential equations = the number of boundary conditions
-    int m1,                                    // m1             = the number of nodes at which continuous boundary conditions are specified
-    int m2,                                    // m2             = the number of nodes at which discontinuous boundary conditions are specified
+    int m,                                     // m              = the number of nodes at which boundary conditions are specified
     int nGrid,                                 // nGrid          = the number of points at which the state can be evaluated
     RowVectorXm<T> tBC,                        // tBC            = row vector of values at which boundary conditions are specified               -- (1xm)
     VectorXm<T> oxt1,                          // oxt1           = column vector of the guessed initial state                                    -- ((n*(m-2))x1)    
@@ -215,6 +214,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
         MatrixXm<T> xSol(n,nGrid+m-2);   // xSol      = the state vector x integrated over the whole grid in the solution of the IVP solver                     -- (nx(nGrid+m-2)m)
         RowVectorXm<T> tSolP(nGrid);     // tSolP     = the independent variable t over the whole grid in the perturbed solution of the IVP solver              -- (1xnGrid)    
         MatrixXm<T> xSolP(n,nGrid);      // xSolP     = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver           -- (nxnGrid)
+        RowVectorXi BCCols(m);           // BCCols    = the columns in the grid that correspond to boundary values                                         -- (1xm)
         VectorXm<T> kxt1(n*(m-2));       // kxt1      = the computed initial state vector in the k-th iteration at the left side of every interval              -- ((n*(m-2))x1)
         VectorXm<T> kxtm(n*(m-2));       // kxtm      = the computed final state vector in the k-th iteration at the left side of every interval                -- ((n*(m-2))x1)
         VectorXm<T> kxt1P((n*(m-2)));    // kxt1      = the computed perturbed initial state vector in the k-th iteration                                       -- ((n*(m-2))x1)
@@ -222,12 +222,13 @@ template <typename T> BVPSolution<T> nlmpBVP2(
         VectorXm<T> xt(n);               // xt        = the computed state vector to be input to the IVP solver                                                 -- (nx1)
         VectorXm<T> xtP(n);              // xtP       = the computed perturbed state vector to be input to the IVP solver                                       -- (nx1)
         VectorXm<T> kg(n*(m-1));         // kg        = the boundary condition residues in the k-th iteration                                                   -- ((n(m-1))x1)
-        VectorXm<T> kgj(n*(m-1)));       // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                             -- ((n(m-1))x1)
+        VectorXm<T> kgj(n*(m-1));       // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                             -- ((n(m-1))x1)
         MatrixXm<T> kS(n*(m-1),n*(m-1)); // kS        = the adjusting matrix for correcting the initial condition k-th iteration                                -- ((n(m-1))x(n(m-1))) 
         BVPSolution<T> bvpSolution;
 
         // Variable definitions
         h = (tBC(tBC.cols()-1) - tBC(0))/(nGrid-1);
+        BCCols = ((tBC-tBC(0)*RowVectorXm<T>::Ones(m))/h).template array().template round().template cast<int>();
 
         if(ivamParameters.printDebug){
             cout<<"Boundary nodes correspond to the below columns: "<<endl<<BCCols<<endl<<endl;
@@ -302,7 +303,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
                         kxtmP.segment(i*n,n) = xtP;
                     }             
                     kgj = BCResidues(kxt1P, kxtmP);
-                    kS.col(l*n+j) = (kgj - kg)/kepsilonj
+                    kS.col(l*n+j) = (kgj - kg)/kepsilonj;
                 }              
             }
 
