@@ -163,8 +163,12 @@ int main(
     // VectorXm<mpreal>   oxt1(3);            // oxt1           = column vector of the guessed initial state                                       -- (nx1)
 
     /* Boundary Value Problem 3 */
-    RowVectorXm<mpreal> tBC(6);
-    MatrixXm<mpreal>   oxt1(2,5); 
+    // RowVectorXm<mpreal> tBC(6);            // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)  
+    // MatrixXm<mpreal> oxt1(2,5);            // oxt1           = matrix of the guessed initial state                                              -- (nx(m-1))
+
+    /* Boundary Value Problem 4 */
+    RowVectorXm<mpreal> tBC(5);            // t_BC           = row vector of values at which the boundary conditions are specified              -- (1xm)
+    MatrixXm<mpreal> oxt1(2,4);            // oxt1           = matrix of the guessed initial state                                              -- (nx(m-1))
 
     BVPSolution<mpreal> bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -186,11 +190,18 @@ int main(
     //         1;
 
     /* Boundary Value Problem 3 */
+    // // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+    // tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
+    // // oxt1 = a matrix of the guessed initial state on the left side of each integration interval                                        -- (nx(m-1))
+    // oxt1 <<  0.1, 0.1, 0.4, 0.8, 0.9,
+    //         -0.6, 0.1, 0.9, 2.1, 0.8;
+
+    /* Boundary Value Problem 4 */
     // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-    tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
+    tBC  << 0.0, mpfr::const_pi()/4, mpfr::const_pi()/2, 3*mpfr::const_pi()/4, mpfr::const_pi();
     // oxt1 = a matrix of the guessed initial state on the left side of each integration interval                                        -- (nx(m-1))
-    oxt1 <<  0.1, 0.1, 0.4, 0.8, 0.9,
-            -0.6, 0.1, 0.9, 2.1, 0.8;
+    oxt1 << -0.1, 0.7, 0.1,-0.7,
+             1.1, 0.7,-1.1,-0.7;
 
     // Assign the parameters for IVAM
     ivamParameters.EPSILON    = 1e-10; // EPSILON    = the state perturbation parameter to probe the differential equation system with
@@ -213,7 +224,10 @@ int main(
     // bvpSolution = nlmpBVP<mpreal>(3, 3, 101, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     /* Boundary Value Problem 3 */
-    bvpSolution = nlmpBVP2<mpreal>(2, 6, 12*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+    // bvpSolution = nlmpBVP2<mpreal>(2, 6, 12*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
+
+    /* Boundary Value Problem 4 */
+    bvpSolution = nlmpBVP2<mpreal>(2, 5, 10*10+1, tBC, oxt1, dxBydt, BCResidues, ivamParameters);
 
     cout<<endl<<"Done solving the BVP..."<<endl;
 
