@@ -191,7 +191,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED*** int m,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // m***REMOVED******REMOVED******REMOVED******REMOVED***  = the number of nodes at which boundary conditions are specified
 ***REMOVED*** int nGrid,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// nGrid***REMOVED******REMOVED******REMOVED*** = the number of points at which the state can be evaluated
 ***REMOVED*** RowVectorXm<T> tBC,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// tBC***REMOVED******REMOVED******REMOVED******REMOVED***= row vector of values at which boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (1xm)
-***REMOVED*** VectorXm<T> oxt1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = matrix of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx(m-1))***REMOVED*** 
+***REMOVED*** MatrixXm<T> oxt1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // oxt1***REMOVED******REMOVED******REMOVED***  = matrix of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx(m-1))***REMOVED*** 
 ***REMOVED*** VectorXm<T> dxBydt(T t, VectorXm<T> x),***REMOVED*** // dxBydt***REMOVED******REMOVED******REMOVED***= a function that defines the derivative of a state vector x at t***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 ***REMOVED*** VectorXm<T> BCResidues(MatrixXm<T> xBCL,***REMOVED***// BCResidues***REMOVED***  = a function that defines the boundary condition residues...
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***MatrixXm<T> xBCR),  //***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***...at the left and right state vectors xBCL and xBCR***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (n(m-1)x1)***REMOVED******REMOVED***
@@ -212,8 +212,8 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED******REMOVED***  T kGPrev;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// kGPrev***REMOVED*** = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
 ***REMOVED******REMOVED***  RowVectorXm<T> tSol(nGrid+m-2);  // tSol***REMOVED******REMOVED***= the independent variable t over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (1x(nGrid+m-2))
 ***REMOVED******REMOVED***  MatrixXm<T> xSol(n,nGrid+m-2);***REMOVED***// xSol***REMOVED******REMOVED***= the state vector x integrated over the whole grid in the solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx(nGrid+m-2)m)
-***REMOVED******REMOVED***  RowVectorXm<T> tSolP(nGrid);***REMOVED***  // tSolP***REMOVED***  = the independent variable t over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xnGrid)***REMOVED*** 
-***REMOVED******REMOVED***  MatrixXm<T> xSolP(n,nGrid);***REMOVED******REMOVED***// xSolP***REMOVED***  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED******REMOVED***  -- (nxnGrid)
+***REMOVED******REMOVED***  RowVectorXm<T> tSolP(nGrid+m+2); // tSolP***REMOVED***  = the independent variable t over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xnGrid)***REMOVED*** 
+***REMOVED******REMOVED***  MatrixXm<T> xSolP(n,nGrid+m+2);  // xSolP***REMOVED***  = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver***REMOVED******REMOVED******REMOVED***  -- (nxnGrid)
 ***REMOVED******REMOVED***  RowVectorXi BCCols(m);***REMOVED******REMOVED******REMOVED***  // BCCols***REMOVED*** = the columns in the grid that correspond to boundary values***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
 ***REMOVED******REMOVED***  MatrixXm<T> kxt1(n,m-1);***REMOVED******REMOVED******REMOVED***// kxt1***REMOVED******REMOVED***= the computed initial state vector in the k-th iteration at the left side of every interval***REMOVED******REMOVED******REMOVED******REMOVED***  -- (nx(m-1))
 ***REMOVED******REMOVED***  MatrixXm<T> kxtm(n,m-1);***REMOVED******REMOVED******REMOVED***// kxtm***REMOVED******REMOVED***= the computed final state vector in the k-th iteration at the left side of every interval***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx(m-1))
@@ -222,8 +222,9 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED******REMOVED***  VectorXm<T> xt(n);***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// xt***REMOVED******REMOVED***  = the computed state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
 ***REMOVED******REMOVED***  VectorXm<T> xtP(n);***REMOVED******REMOVED******REMOVED******REMOVED***  // xtP***REMOVED******REMOVED*** = the computed perturbed state vector to be input to the IVP solver***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 ***REMOVED******REMOVED***  VectorXm<T> kg(n*(m-1));***REMOVED******REMOVED******REMOVED***// kg***REMOVED******REMOVED***  = the boundary condition residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- ((n(m-1))x1)
-***REMOVED******REMOVED***  VectorXm<T> kgj(n*(m-1));***REMOVED******REMOVED*** // kgj***REMOVED******REMOVED*** = the j-th boundary condition perturbed system residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- ((n(m-1))x1)
+***REMOVED******REMOVED***  VectorXm<T> kgj(n*(m-1));***REMOVED******REMOVED***  // kgj***REMOVED******REMOVED*** = the j-th boundary condition perturbed system residues in the k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- ((n(m-1))x1)
 ***REMOVED******REMOVED***  MatrixXm<T> kS(n*(m-1),n*(m-1)); // kS***REMOVED******REMOVED***  = the adjusting matrix for correcting the initial condition k-th iteration***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  -- ((n(m-1))x(n(m-1))) 
+***REMOVED******REMOVED***  VectorXm<T> xt1Change(n*(m-1));
 ***REMOVED******REMOVED***  BVPSolution<T> bvpSolution;
 
 ***REMOVED******REMOVED***  // Variable definitions
@@ -292,24 +293,29 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(l = 0; l<(m-1); l++){  
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kxt1P = kxt1;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** for(j=0; j<n; i++){***REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,i)));
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** for(j=0; j<n; j++){***REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,l)));
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // kepsilonj = ivamParameters.EPSILON;***REMOVED******REMOVED***  
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kxt1P.col(l) = kxt1.col(l) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j);***REMOVED***  
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  colP = 0;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  for(i=0; i<(m-1); i++){
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"i = "<<i<<", j = "<<j<<", l = "<<l<<"..."<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***xtP  = kxt1P.col(i);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(StepperType<T>(), dxBydtWrapper, xtP, tBC(i), tBC(i+1), h, storeSolP); 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***kxtmP.col(i) = xtP;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  }***REMOVED******REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // cout<<"Exited the i loop..."<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kgj = BCResidues(kxt1P,kxtmP);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kS.col(l*n+j) = (kgj - kg)/kepsilonj;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }***REMOVED******REMOVED******REMOVED******REMOVED***  
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }***REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Exited the j loop..."<<endl;***REMOVED******REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
+***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Exited the l loop..."<<endl;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***kalpha = 1;
-***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation***REMOVED******REMOVED******REMOVED******REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED***kxt1 = kxt1 - Map<MatrixXm<T>>((kS.colPivHouseholderQr().solve(kalpha*kg)).template data(),n,m-1);
+***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation
+***REMOVED******REMOVED******REMOVED******REMOVED***xt1Change = kS.colPivHouseholderQr().solve(kalpha*kg).array();***REMOVED******REMOVED******REMOVED******REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED***kxt1 = kxt1 - Map<MatrixXm<T>>(xt1Change.data(),n,m-1);
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Start the next iteration
 ***REMOVED******REMOVED******REMOVED******REMOVED***kGPrev = kG;
@@ -339,8 +345,14 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 
 ***REMOVED******REMOVED***  bvpSolution.t***REMOVED***= tSol;
 ***REMOVED******REMOVED***  bvpSolution.x***REMOVED***= xSol;
-***REMOVED******REMOVED***  bvpSolution.tBC = tBC;
-***REMOVED******REMOVED***  bvpSolution.xBC = xSol(Eigen::all, BCCols);
+***REMOVED******REMOVED***  bvpSolution.tBC.resize(2*m-2);
+***REMOVED******REMOVED***  bvpSolution.xBC.resize(n,2*m-2);
+***REMOVED******REMOVED***  for(i=0; i<(m-1); i++){
+***REMOVED******REMOVED******REMOVED******REMOVED***bvpSolution.tBC(2*i) = tBC(i);
+***REMOVED******REMOVED******REMOVED******REMOVED***bvpSolution.tBC(2*i+1) = tBC(i+1);
+***REMOVED******REMOVED******REMOVED******REMOVED***bvpSolution.xBC.col(2*i) = kxt1.col(i);
+***REMOVED******REMOVED******REMOVED******REMOVED***bvpSolution.xBC.col(2*i+1) = kxtm.col(i); 
+***REMOVED******REMOVED***  }
 ***REMOVED******REMOVED***  return bvpSolution;
 ***REMOVED*** }
 // ==================

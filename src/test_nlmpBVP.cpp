@@ -83,7 +83,7 @@ VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBCL, MatrixXm<mpreal> xBCR){
 ***REMOVED*** /* Boundary Value Problem 3 */
 ***REMOVED*** VectorXm<mpreal> residues(10);
 ***REMOVED*** residues(0) = xBCL(0,0)-0;
-***REMOVED*** residues(1) = xBCL(1,4)-0;
+***REMOVED*** residues(1) = xBCL(1,0)-1;
 ***REMOVED*** residues(2) = xBCR(0,0) - xBCL(0,1) - 1;
 ***REMOVED*** residues(3) = xBCR(1,0) - xBCL(1,1) - 0;
 ***REMOVED*** residues(4) = xBCR(1,1) - xBCL(1,2) + 1;
