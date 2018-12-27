@@ -29,6 +29,12 @@
 // Welsh, Wayne, and Takeo Ojika.
 // "Multipoint boundary value problems with discontinuities I. Algorithms and applications."
 // Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.
+
+/* Boundary value problem 4 */
+// Example 3
+// Welsh, Wayne, and Takeo Ojika.
+// "Multipoint boundary value problems with discontinuities I. Algorithms and applications."
+// Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.
 // ============================
 
 // ===============================
@@ -60,6 +66,11 @@ VectorXm<mpreal> dxBydt(mpreal t, VectorXm<mpreal> x){
     // dxdt(2) = 25*x(1) - 1;
 
     /* Boundary Value Problem 3 */
+    // VectorXm<mpreal> dxdt(2);
+    // dxdt(0) =  x(1);
+    // dxdt(1) = -x(0);
+
+    /* Boundary Value Problem 4 */
     VectorXm<mpreal> dxdt(2);
     dxdt(0) =  x(1);
     dxdt(1) = -x(0);
@@ -97,17 +108,28 @@ VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBC){
 VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBCL, MatrixXm<mpreal> xBCR){
 
     /* Boundary Value Problem 3 */
-    VectorXm<mpreal> residues(10);
+    // VectorXm<mpreal> residues(10);
+    // residues(0) = xBCL(0,0)-0;
+    // residues(1) = xBCL(1,0)-1;
+    // residues(2) = xBCR(0,0) - xBCL(0,1) - 1;
+    // residues(3) = xBCR(1,0) - xBCL(1,1) - 0;
+    // residues(4) = xBCR(1,1) - xBCL(1,2) + 1;
+    // residues(5) = xBCR(0,1) - xBCL(0,2) + 0;
+    // residues(6) = xBCR(0,2) - xBCL(0,3) - 1;
+    // residues(7) = xBCR(1,2) - xBCL(1,3) - (sqrt(3)-1);
+    // residues(8) = xBCR(0,3) - xBCL(0,4) - 0;
+    // residues(9) = xBCR(1,3) - xBCL(1,4) - 0;
+
+    /* Boundary Value Problem 4 */
+    VectorXm<mpreal> residues(8);
     residues(0) = xBCL(0,0)-0;
     residues(1) = xBCL(1,0)-1;
-    residues(2) = xBCR(0,0) - xBCL(0,1) - 1;
-    residues(3) = xBCR(1,0) - xBCL(1,1) - 0;
-    residues(4) = xBCR(1,1) - xBCL(1,2) + 1;
-    residues(5) = xBCR(0,1) - xBCL(0,2) + 0;
-    residues(6) = xBCR(0,2) - xBCL(0,3) - 1;
-    residues(7) = xBCR(1,2) - xBCL(1,3) - (sqrt(3)-1);
-    residues(8) = xBCR(0,3) - xBCL(0,4) - 0;
-    residues(9) = xBCR(1,3) - xBCL(1,4) - 0;
+    residues(2) = pow(xBCL(0,1),2)*pow(xBCL(1,1),3) - exp(xBCR(1,1))*pow(xBCR(1,0),2)*pow(xBCL(1,3),2) + pow(xBCR(1,3),2)*pow(xBCR(0,2),2) - 0.1859767072;
+    residues(3) = pow(xBCR(0,1),2)*pow(xBCR(0,0),3)*pow(xBCL(0,3),2) + pow(xBCL(1,2),2)*exp(xBCR(1,2)) + pow(xBCL(0,2),2)*pow(xBCR(0,3),2) - 0.1261677772;
+    residues(4) = xBCR(0,0) - xBCL(0,1) + 0;
+    residues(5) = xBCR(1,0) - xBCL(1,1) + 0;
+    residues(6) = xBCR(0,2) - xBCL(0,3) + 0;
+    residues(7) = xBCR(1,2) - xBCL(1,3) + 0;
 
     return residues;
 }

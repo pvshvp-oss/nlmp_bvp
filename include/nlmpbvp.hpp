@@ -15,7 +15,7 @@
 // ===============================
 // Includes and global definitions
 // ===============================
-#include "nlmpbvp_impl.hpp" // Implementation of the solver function
+#include "nlmpbvp_impl.hpp" // Implementation of the solver functions
 using namespace Eigen;      // For matrix and vector data types and operations
 // ===============================
 
