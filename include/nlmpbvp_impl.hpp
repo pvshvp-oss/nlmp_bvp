@@ -191,7 +191,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
     int m,                                     // m              = the number of nodes at which boundary conditions are specified
     int nGrid,                                 // nGrid          = the number of points at which the state can be evaluated
     RowVectorXm<T> tBC,                        // tBC            = row vector of values at which boundary conditions are specified               -- (1xm)
-    VectorXm<T> oxt1,                          // oxt1           = matrix of the guessed initial state                                           -- (nx(m-1))    
+    MatrixXm<T> oxt1,                          // oxt1           = matrix of the guessed initial state                                           -- (nx(m-1))    
     VectorXm<T> dxBydt(T t, VectorXm<T> x),    // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
     VectorXm<T> BCResidues(MatrixXm<T> xBCL,   // BCResidues     = a function that defines the boundary condition residues...
                            MatrixXm<T> xBCR),  //                  ...at the left and right state vectors xBCL and xBCR                          -- (n(m-1)x1)      
@@ -212,8 +212,8 @@ template <typename T> BVPSolution<T> nlmpBVP2(
         T kGPrev;                        // kGPrev    = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
         RowVectorXm<T> tSol(nGrid+m-2);  // tSol      = the independent variable t over the whole grid in the solution of the IVP solver                        -- (1x(nGrid+m-2))
         MatrixXm<T> xSol(n,nGrid+m-2);   // xSol      = the state vector x integrated over the whole grid in the solution of the IVP solver                     -- (nx(nGrid+m-2)m)
-        RowVectorXm<T> tSolP(nGrid);     // tSolP     = the independent variable t over the whole grid in the perturbed solution of the IVP solver              -- (1xnGrid)    
-        MatrixXm<T> xSolP(n,nGrid);      // xSolP     = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver           -- (nxnGrid)
+        RowVectorXm<T> tSolP(nGrid+m+2); // tSolP     = the independent variable t over the whole grid in the perturbed solution of the IVP solver              -- (1xnGrid)    
+        MatrixXm<T> xSolP(n,nGrid+m+2);  // xSolP     = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver           -- (nxnGrid)
         RowVectorXi BCCols(m);           // BCCols    = the columns in the grid that correspond to boundary values                                         -- (1xm)
         MatrixXm<T> kxt1(n,m-1);         // kxt1      = the computed initial state vector in the k-th iteration at the left side of every interval              -- (nx(m-1))
         MatrixXm<T> kxtm(n,m-1);         // kxtm      = the computed final state vector in the k-th iteration at the left side of every interval                -- (nx(m-1))
@@ -222,8 +222,9 @@ template <typename T> BVPSolution<T> nlmpBVP2(
         VectorXm<T> xt(n);               // xt        = the computed state vector to be input to the IVP solver                                                 -- (nx1)
         VectorXm<T> xtP(n);              // xtP       = the computed perturbed state vector to be input to the IVP solver                                       -- (nx1)
         VectorXm<T> kg(n*(m-1));         // kg        = the boundary condition residues in the k-th iteration                                                   -- ((n(m-1))x1)
-        VectorXm<T> kgj(n*(m-1));       // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                             -- ((n(m-1))x1)
+        VectorXm<T> kgj(n*(m-1));        // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                             -- ((n(m-1))x1)
         MatrixXm<T> kS(n*(m-1),n*(m-1)); // kS        = the adjusting matrix for correcting the initial condition k-th iteration                                -- ((n(m-1))x(n(m-1))) 
+        VectorXm<T> xt1Change(n*(m-1));
         BVPSolution<T> bvpSolution;
 
         // Variable definitions
@@ -292,24 +293,29 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 
             for(l = 0; l<(m-1); l++){  
                 kxt1P = kxt1;
-                for(j=0; j<n; i++){   
-                    kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,i)));
+                for(j=0; j<n; j++){   
+                    kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,l)));
                     // kepsilonj = ivamParameters.EPSILON;        
                     kxt1P.col(l) = kxt1.col(l) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j);     
                     colP = 0;               
                     for(i=0; i<(m-1); i++){
+                        // cout<<"i = "<<i<<", j = "<<j<<", l = "<<l<<"..."<<endl;
                         xtP  = kxt1P.col(i);
                         integrate_const(StepperType<T>(), dxBydtWrapper, xtP, tBC(i), tBC(i+1), h, storeSolP); 
                         kxtmP.col(i) = xtP;
                     }             
+                    // cout<<"Exited the i loop..."<<endl;
                     kgj = BCResidues(kxt1P,kxtmP);
                     kS.col(l*n+j) = (kgj - kg)/kepsilonj;
-                }              
+                }    
+                // cout<<"Exited the j loop..."<<endl;          
             }
+            cout<<"Exited the l loop..."<<endl;
 
             kalpha = 1;
-            // Solve the linarized adjusting equation            
-            kxt1 = kxt1 - Map<MatrixXm<T>>((kS.colPivHouseholderQr().solve(kalpha*kg)).template data(),n,m-1);
+            // Solve the linarized adjusting equation
+            xt1Change = kS.colPivHouseholderQr().solve(kalpha*kg).array();            
+            kxt1 = kxt1 - Map<MatrixXm<T>>(xt1Change.data(),n,m-1);
 
             // Start the next iteration
             kGPrev = kG;
@@ -339,8 +345,14 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 
         bvpSolution.t   = tSol;
         bvpSolution.x   = xSol;
-        bvpSolution.tBC = tBC;
-        bvpSolution.xBC = xSol(Eigen::all, BCCols);
+        bvpSolution.tBC.resize(2*m-2);
+        bvpSolution.xBC.resize(n,2*m-2);
+        for(i=0; i<(m-1); i++){
+            bvpSolution.tBC(2*i) = tBC(i);
+            bvpSolution.tBC(2*i+1) = tBC(i+1);
+            bvpSolution.xBC.col(2*i) = kxt1.col(i);
+            bvpSolution.xBC.col(2*i+1) = kxtm.col(i); 
+        }
         return bvpSolution;
     }
 // ==================
