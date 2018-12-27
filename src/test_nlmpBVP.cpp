@@ -126,7 +126,7 @@ int main(
 
 ***REMOVED*** /* Boundary Value Problem 3 */
 ***REMOVED*** RowVectorXm<mpreal> tBC(6);
-***REMOVED*** VectorXm<mpreal>***REMOVED***oxt1(10); 
+***REMOVED*** MatrixXm<mpreal>***REMOVED***oxt1(2,5); 
 
 ***REMOVED*** BVPSolution<mpreal> bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -149,16 +149,8 @@ int main(
 
 ***REMOVED*** /* Boundary Value Problem 3 */
 ***REMOVED*** tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
-***REMOVED*** oxt1 <<  0.1,
-***REMOVED******REMOVED******REMOVED******REMOVED***-0.6,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 0.1,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 0.1,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 0.4,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 0.9,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 0.8,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 2.1,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 0.9,
-***REMOVED******REMOVED******REMOVED******REMOVED*** 0.8;
+***REMOVED*** oxt1 <<  0.1, 0.1, 0.4, 0.8, 0.9,
+***REMOVED******REMOVED******REMOVED******REMOVED***-0.6, 0.1, 0.9, 2.1, 0.8;
 
 ***REMOVED*** // Assign the parameters for IVAM
 ***REMOVED*** ivamParameters.EPSILON***REMOVED*** = 1e-10; // EPSILON***REMOVED*** = the state perturbation parameter to probe the differential equation system with
