@@ -273,13 +273,14 @@ template <typename T> BVPSolution<T> nlmpBVP2(
         kxt1           = oxt1;
 
         col = 0;
+        // Solve the IVPs for the first time
         for(i=0; i<(m-1); i++){
             xt  = kxt1.col(i);
             integrate_const(StepperType<T>(), dxBydtWrapper, xt, tBC(i), tBC(i+1), h, storeSol); 
             kxtm.col(i) = xt;
-        }
-        kg = BCResidues(kxt1,kxtm);
-        kG = kg.norm()/sqrt(n*(m-1));
+        }        
+        kg = BCResidues(kxt1,kxtm);   // Get the boundary condition residues   
+        kG = kg.norm()/sqrt(n*(m-1)); // Get the RMS value of the residues
 
         while(kG > ivamParameters.SIGMA /* When the error is more than the max. threshold */){      
 
@@ -300,26 +301,25 @@ template <typename T> BVPSolution<T> nlmpBVP2(
                 }
             }
 
+            // Loop where every iteration perturbs the initial state vector of a different interval
             for(l = 0; l<(m-1); l++){  
                 kxt1P = kxt1;
-                for(j=0; j<n; j++){   
-                    kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,l)));
+                // Loop where every iteration perturbs a different initial state variable 
+                for(j=0; j<n; j++){                       
+                    kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,l))); // The perturbation vector
                     // kepsilonj = ivamParameters.EPSILON;        
-                    kxt1P.col(l) = kxt1.col(l) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j);     
-                    colP = 0;               
+                    kxt1P.col(l) = kxt1.col(l) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j); // Perturb the initial state vector
+                    colP = 0;       
+                    // Solve the perturbed IVPs        
                     for(i=0; i<(m-1); i++){
-                        // cout<<"i = "<<i<<", j = "<<j<<", l = "<<l<<"..."<<endl;
                         xtP  = kxt1P.col(i);
                         integrate_const(StepperType<T>(), dxBydtWrapper, xtP, tBC(i), tBC(i+1), h, storeSolP); 
                         kxtmP.col(i) = xtP;
                     }             
-                    // cout<<"Exited the i loop..."<<endl;
-                    kgj = BCResidues(kxt1P,kxtmP);
-                    kS.col(l*n+j) = (kgj - kg)/kepsilonj;
-                }    
-                // cout<<"Exited the j loop..."<<endl;          
+                    kgj = BCResidues(kxt1P,kxtmP);        // Get the boundary condition residues for the perturbed IVP
+                    kS.col(l*n+j) = (kgj - kg)/kepsilonj; // Compute one column of the adjusting matrix (which is really a numerical partial derivative of the BCs w.r.t. perturbation)
+                }       
             }
-            cout<<"Exited the l loop..."<<endl;
 
             kalpha = 1;
             // Solve the linarized adjusting equation
@@ -330,15 +330,15 @@ template <typename T> BVPSolution<T> nlmpBVP2(
             kGPrev = kG;
             ++k;
 
-            // Solve the initial value problems
+            // Solve the IVPs
             col = 0;
             for(i=0; i<(m-1); i++){
                 xt  = kxt1.col(i);
                 integrate_const(StepperType<T>(), dxBydtWrapper, xt, tBC(i), tBC(i+1), h, storeSol); 
                 kxtm.col(i) = xt;
             }
-            kg = BCResidues(kxt1,kxtm);
-            kG = kg.norm()/sqrt(n*(m-1));
+            kg = BCResidues(kxt1,kxtm);   // Get the boundary condition residues 
+            kG = kg.norm()/sqrt(n*(m-1)); // Get the RMS value of the residues
 
             if(k >= 1000){
                 if(ivamParameters.printDebug){
@@ -352,6 +352,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
             cout<<"Ran "<<k<<" iteration(s)."<<endl;
         }
 
+        // Store the solutions in the structure
         bvpSolution.t   = tSol;
         bvpSolution.x   = xSol;
         bvpSolution.tBC.resize(2*m-2);
@@ -362,6 +363,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
             bvpSolution.xBC.col(2*i) = kxt1.col(i);
             bvpSolution.xBC.col(2*i+1) = kxtm.col(i); 
         }
+        
         return bvpSolution;
     }
 // ==================
