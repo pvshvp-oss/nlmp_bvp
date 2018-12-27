@@ -126,7 +126,7 @@ int main(
 
     /* Boundary Value Problem 3 */
     RowVectorXm<mpreal> tBC(6);
-    VectorXm<mpreal>   oxt1(10); 
+    MatrixXm<mpreal>   oxt1(2,5); 
 
     BVPSolution<mpreal> bvpSolution;       // bvpSolution    = the structure in which the solutions of the boundary value problem will be saved
     IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -149,16 +149,8 @@ int main(
 
     /* Boundary Value Problem 3 */
     tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
-    oxt1 <<  0.1,
-            -0.6,
-             0.1,
-             0.1,
-             0.4,
-             0.9,
-             0.8,
-             2.1,
-             0.9,
-             0.8;
+    oxt1 <<  0.1, 0.1, 0.4, 0.8, 0.9,
+            -0.6, 0.1, 0.9, 2.1, 0.8;
 
     // Assign the parameters for IVAM
     ivamParameters.EPSILON    = 1e-10; // EPSILON    = the state perturbation parameter to probe the differential equation system with

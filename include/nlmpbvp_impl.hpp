@@ -191,7 +191,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
     int m,                                     // m              = the number of nodes at which boundary conditions are specified
     int nGrid,                                 // nGrid          = the number of points at which the state can be evaluated
     RowVectorXm<T> tBC,                        // tBC            = row vector of values at which boundary conditions are specified               -- (1xm)
-    VectorXm<T> oxt1,                          // oxt1           = column vector of the guessed initial state                                    -- ((n*(m-2))x1)    
+    VectorXm<T> oxt1,                          // oxt1           = matrix of the guessed initial state                                           -- (nx(m-1))    
     VectorXm<T> dxBydt(T t, VectorXm<T> x),    // dxBydt         = a function that defines the derivative of a state vector x at t               -- (nx1)
     VectorXm<T> BCResidues(MatrixXm<T> xBCL,   // BCResidues     = a function that defines the boundary condition residues...
                            MatrixXm<T> xBCR),  //                  ...at the left and right state vectors xBCL and xBCR                          -- (n(m-1)x1)      
@@ -215,10 +215,10 @@ template <typename T> BVPSolution<T> nlmpBVP2(
         RowVectorXm<T> tSolP(nGrid);     // tSolP     = the independent variable t over the whole grid in the perturbed solution of the IVP solver              -- (1xnGrid)    
         MatrixXm<T> xSolP(n,nGrid);      // xSolP     = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver           -- (nxnGrid)
         RowVectorXi BCCols(m);           // BCCols    = the columns in the grid that correspond to boundary values                                         -- (1xm)
-        VectorXm<T> kxt1(n*(m-2));       // kxt1      = the computed initial state vector in the k-th iteration at the left side of every interval              -- ((n*(m-2))x1)
-        VectorXm<T> kxtm(n*(m-2));       // kxtm      = the computed final state vector in the k-th iteration at the left side of every interval                -- ((n*(m-2))x1)
-        VectorXm<T> kxt1P((n*(m-2)));    // kxt1      = the computed perturbed initial state vector in the k-th iteration                                       -- ((n*(m-2))x1)
-        VectorXm<T> kxtmP((n*(m-2)));    // kxtm      = the computed perturbed initial state vector in the k-th iteration                                       -- ((n*(m-2))x1)
+        MatrixXm<T> kxt1(n,m-1);         // kxt1      = the computed initial state vector in the k-th iteration at the left side of every interval              -- (nx(m-1))
+        MatrixXm<T> kxtm(n,m-1);         // kxtm      = the computed final state vector in the k-th iteration at the left side of every interval                -- (nx(m-1))
+        MatrixXm<T> kxt1P(n,m-1);        // kxt1      = the computed perturbed initial state vector in the k-th iteration                                       -- (nx(m-1))
+        MatrixXm<T> kxtmP(n,m-1);        // kxtm      = the computed perturbed initial state vector in the k-th iteration                                       -- (nx(m-1))
         VectorXm<T> xt(n);               // xt        = the computed state vector to be input to the IVP solver                                                 -- (nx1)
         VectorXm<T> xtP(n);              // xtP       = the computed perturbed state vector to be input to the IVP solver                                       -- (nx1)
         VectorXm<T> kg(n*(m-1));         // kg        = the boundary condition residues in the k-th iteration                                                   -- ((n(m-1))x1)
@@ -264,11 +264,11 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 
         col = 0;
         for(i=0; i<(m-1); i++){
-            xt  = kxt1.segment(i*n,n);
+            xt  = kxt1.col(i);
             integrate_const(StepperType<T>(), dxBydtWrapper, xt, tBC(i), tBC(i+1), h, storeSol); 
-            kxtm.segment(i*n,n) = xt;
+            kxtm.col(i) = xt;
         }
-        kg = BCResidues(kxt1, kxtm);
+        kg = BCResidues(kxt1,kxtm);
         kG = kg.norm()/sqrt(n*(m-1));
 
         while(kG > ivamParameters.SIGMA /* When the error is more than the max. threshold */){      
@@ -293,23 +293,23 @@ template <typename T> BVPSolution<T> nlmpBVP2(
             for(l = 0; l<(m-1); l++){  
                 kxt1P = kxt1;
                 for(j=0; j<n; i++){   
-                    kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(i*n+j)));
+                    kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,i)));
                     // kepsilonj = ivamParameters.EPSILON;        
-                    kxt1P.segment(l*n,n) = kxt1.segment(l*n,n) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j);     
+                    kxt1P.col(l) = kxt1.col(l) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j);     
                     colP = 0;               
                     for(i=0; i<(m-1); i++){
-                        xtP  = kxt1P.segment(i*n,n);
+                        xtP  = kxt1P.col(i);
                         integrate_const(StepperType<T>(), dxBydtWrapper, xtP, tBC(i), tBC(i+1), h, storeSolP); 
-                        kxtmP.segment(i*n,n) = xtP;
+                        kxtmP.col(i) = xtP;
                     }             
-                    kgj = BCResidues(kxt1P, kxtmP);
+                    kgj = BCResidues(kxt1P,kxtmP);
                     kS.col(l*n+j) = (kgj - kg)/kepsilonj;
                 }              
             }
 
             kalpha = 1;
             // Solve the linarized adjusting equation            
-            kxt1 = kxt1 - kS.colPivHouseholderQr().solve(kalpha*kg);
+            kxt1 = kxt1 - Map<MatrixXm<T>>(kS.colPivHouseholderQr().solve(kalpha*kg).data(),n,m-1);
 
             // Start the next iteration
             kGPrev = kG;
@@ -318,11 +318,11 @@ template <typename T> BVPSolution<T> nlmpBVP2(
             // Solve the initial value problems
             col = 0;
             for(i=0; i<(m-1); i++){
-                xt  = kxt1.segment(i*n,n);
+                xt  = kxt1.col(i);
                 integrate_const(StepperType<T>(), dxBydtWrapper, xt, tBC(i), tBC(i+1), h, storeSol); 
-                kxtm.segment(i*n,n) = xt;
+                kxtm.col(i) = xt;
             }
-            kg = BCResidues(kxt1, kxtm);
+            kg = BCResidues(kxt1,kxtm);
             kG = kg.norm()/sqrt(n*(m-1));
 
             if(k >= 1000){
