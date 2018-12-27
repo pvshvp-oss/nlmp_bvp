@@ -273,13 +273,14 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED******REMOVED***  kxt1***REMOVED******REMOVED******REMOVED***  = oxt1;
 
 ***REMOVED******REMOVED***  col = 0;
+***REMOVED******REMOVED***  // Solve the IVPs for the first time
 ***REMOVED******REMOVED***  for(i=0; i<(m-1); i++){
 ***REMOVED******REMOVED******REMOVED******REMOVED***xt  = kxt1.col(i);
 ***REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(StepperType<T>(), dxBydtWrapper, xt, tBC(i), tBC(i+1), h, storeSol); 
 ***REMOVED******REMOVED******REMOVED******REMOVED***kxtm.col(i) = xt;
-***REMOVED******REMOVED***  }
-***REMOVED******REMOVED***  kg = BCResidues(kxt1,kxtm);
-***REMOVED******REMOVED***  kG = kg.norm()/sqrt(n*(m-1));
+***REMOVED******REMOVED***  }***REMOVED******REMOVED***  
+***REMOVED******REMOVED***  kg = BCResidues(kxt1,kxtm);***REMOVED***// Get the boundary condition residues***REMOVED***
+***REMOVED******REMOVED***  kG = kg.norm()/sqrt(n*(m-1)); // Get the RMS value of the residues
 
 ***REMOVED******REMOVED***  while(kG > ivamParameters.SIGMA /* When the error is more than the max. threshold */){***REMOVED******REMOVED***
 
@@ -300,26 +301,25 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
 
+***REMOVED******REMOVED******REMOVED******REMOVED***// Loop where every iteration perturbs the initial state vector of a different interval
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(l = 0; l<(m-1); l++){  
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kxt1P = kxt1;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** for(j=0; j<n; j++){***REMOVED***
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,l)));
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // Loop where every iteration perturbs a different initial state variable 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** for(j=0; j<n; j++){***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kepsilonj = fmax(ivamParameters.EPSILON, fabs(ivamParameters.EPSILON * kxt1(j,l))); // The perturbation vector
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // kepsilonj = ivamParameters.EPSILON;***REMOVED******REMOVED***  
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kxt1P.col(l) = kxt1.col(l) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j);***REMOVED***  
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  colP = 0;***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kxt1P.col(l) = kxt1.col(l) + kepsilonj*MatrixXm<T>::Identity(n,n).col(j); // Perturb the initial state vector
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  colP = 0;***REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // Solve the perturbed IVPs***REMOVED******REMOVED***  
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  for(i=0; i<(m-1); i++){
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***// cout<<"i = "<<i<<", j = "<<j<<", l = "<<l<<"..."<<endl;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***xtP  = kxt1P.col(i);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***integrate_const(StepperType<T>(), dxBydtWrapper, xtP, tBC(i), tBC(i+1), h, storeSolP); 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***kxtmP.col(i) = xtP;
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  }***REMOVED******REMOVED******REMOVED******REMOVED*** 
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  // cout<<"Exited the i loop..."<<endl;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kgj = BCResidues(kxt1P,kxtmP);
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kS.col(l*n+j) = (kgj - kg)/kepsilonj;
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }***REMOVED*** 
-***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // cout<<"Exited the j loop..."<<endl;***REMOVED******REMOVED******REMOVED*** 
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kgj = BCResidues(kxt1P,kxtmP);***REMOVED******REMOVED***  // Get the boundary condition residues for the perturbed IVP
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***  kS.col(l*n+j) = (kgj - kg)/kepsilonj; // Compute one column of the adjusting matrix (which is really a numerical partial derivative of the BCs w.r.t. perturbation)
+***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** }***REMOVED******REMOVED*** 
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
-***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Exited the l loop..."<<endl;
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***kalpha = 1;
 ***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the linarized adjusting equation
@@ -330,15 +330,15 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED******REMOVED******REMOVED******REMOVED***kGPrev = kG;
 ***REMOVED******REMOVED******REMOVED******REMOVED***++k;
 
-***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the initial value problems
+***REMOVED******REMOVED******REMOVED******REMOVED***// Solve the IVPs
 ***REMOVED******REMOVED******REMOVED******REMOVED***col = 0;
 ***REMOVED******REMOVED******REMOVED******REMOVED***for(i=0; i<(m-1); i++){
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** xt  = kxt1.col(i);
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** integrate_const(StepperType<T>(), dxBydtWrapper, xt, tBC(i), tBC(i+1), h, storeSol); 
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** kxtm.col(i) = xt;
 ***REMOVED******REMOVED******REMOVED******REMOVED***}
-***REMOVED******REMOVED******REMOVED******REMOVED***kg = BCResidues(kxt1,kxtm);
-***REMOVED******REMOVED******REMOVED******REMOVED***kG = kg.norm()/sqrt(n*(m-1));
+***REMOVED******REMOVED******REMOVED******REMOVED***kg = BCResidues(kxt1,kxtm);***REMOVED***// Get the boundary condition residues 
+***REMOVED******REMOVED******REMOVED******REMOVED***kG = kg.norm()/sqrt(n*(m-1)); // Get the RMS value of the residues
 
 ***REMOVED******REMOVED******REMOVED******REMOVED***if(k >= 1000){
 ***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** if(ivamParameters.printDebug){
@@ -352,6 +352,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED******REMOVED******REMOVED******REMOVED***cout<<"Ran "<<k<<" iteration(s)."<<endl;
 ***REMOVED******REMOVED***  }
 
+***REMOVED******REMOVED***  // Store the solutions in the structure
 ***REMOVED******REMOVED***  bvpSolution.t***REMOVED***= tSol;
 ***REMOVED******REMOVED***  bvpSolution.x***REMOVED***= xSol;
 ***REMOVED******REMOVED***  bvpSolution.tBC.resize(2*m-2);
@@ -362,6 +363,7 @@ template <typename T> BVPSolution<T> nlmpBVP2(
 ***REMOVED******REMOVED******REMOVED******REMOVED***bvpSolution.xBC.col(2*i) = kxt1.col(i);
 ***REMOVED******REMOVED******REMOVED******REMOVED***bvpSolution.xBC.col(2*i+1) = kxtm.col(i); 
 ***REMOVED******REMOVED***  }
+***REMOVED******REMOVED***  
 ***REMOVED******REMOVED***  return bvpSolution;
 ***REMOVED*** }
 // ==================
