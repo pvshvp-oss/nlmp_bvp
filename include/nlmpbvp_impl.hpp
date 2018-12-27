@@ -4,6 +4,14 @@
 // ========================================
 // Copyright Shivanand Pattanshetti (shivanand.pattanshetti@gmail.com)
 
+// ==========
+// References
+// ==========
+// [1] Ojika, T., and Y. Kasue. "Initial-value adjusting method for the solution of nonlinear multipoint boundary-value problems."
+//     Journal of Mathematical Analysis and Applications 69.2 (1979): 359-371.
+// [2] Welsh, Wayne, and Takeo Ojika. "Multipoint boundary value problems with discontinuities I. Algorithms and applications."
+//     Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.
+
 // ===============================
 // Includes and global definitions
 // ===============================
@@ -40,30 +48,30 @@ template <typename T> BVPSolution<T> nlmpBVP(
     ){  
 
         // Variable declarations  
-        int j;                          // j         = the inner iterating variable for IVAM                                                              -- [0,n-1]
-        int k;                          // k         = the outer iterating variable for IVAM                                                              -- [0,Inf)
-        int col;                        // col       = the column index of the x solution for the IVP solver                                              -- [0,nGrid-1]
-        int colP;                       // colP      = the column index of the perturbed x solution for the IVP solver                                    -- [0,nGrid-1]
-        T h;                            // h         = the stepper step size for the IVP solver                                                            
-        T t0;                           // t0        = the first boundary value of the independent variable
-        T tm;                           // tm        = the last boundary value of the independent variable
-        T kepsilonj;                    // kepsilonj = the perturbation parameter for a state variable at a particular iteration k
-        T kalpha;                       // kalpha    = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
-        T kG;                           // kG        = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
-        T kGPrev;                       // kGPrev    = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
-        RowVectorXm<T> tSol(nGrid);     // tSol      = the independent variable t over the whole grid in the solution of the IVP solver                   -- (1xnGrid)
-        MatrixXm<T> xSol(n,nGrid);      // xSol      = the state vector x integrated over the whole grid in the solution of the IVP solver                -- (nxnGrid)
-        RowVectorXm<T> tSolP(nGrid);    // tSolP     = the independent variable t over the whole grid in the perturbed solution of the IVP solver         -- (1xnGrid)    
-        MatrixXm<T> xSolP(n,nGrid);     // xSolP     = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
-        RowVectorXi BCCols(m);          // BCCols    = the columns in the grid that correspond to boundary values                                         -- (1xm)
-        VectorXm<T> kxt1(n);            // kxt1      = the computed initial state vector in the k-th iteration                                            -- (nx1)
-        VectorXm<T> kxt1P(n);           // kxt1      = the computed perturbed initial state vector in the k-th iteration                                  -- (nx1)
-        VectorXm<T> xt(n);              // xt        = the computed initial state vector to be input to the IVP solver                                    -- (nx1)
-        VectorXm<T> xtP(n);             // xtP       = the computed perturbed initial state vector to be input to the IVP solver                          -- (nx1)
-        VectorXm<T> kg(n);              // kg        = the boundary condition residues in the k-th iteration                                              -- (nx1)
-        VectorXm<T> kgj(n);             // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                        -- (nx1)
-        MatrixXm<T> kS(n,n);            // kS        = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
-        BVPSolution<T> bvpSolution;         
+        int j;                          // j           = the inner iterating variable for IVAM                                                              -- [0,n-1]
+        int k;                          // k           = the outer iterating variable for IVAM                                                              -- [0,Inf)
+        int col;                        // col         = the column index of the x solution for the IVP solver                                              -- [0,nGrid-1]
+        int colP;                       // colP        = the column index of the perturbed x solution for the IVP solver                                    -- [0,nGrid-1]
+        T h;                            // h           = the stepper step size for the IVP solver                                                            
+        T t0;                           // t0          = the first boundary value of the independent variable
+        T tm;                           // tm          = the last boundary value of the independent variable
+        T kepsilonj;                    // kepsilonj   = the perturbation parameter for a state variable at a particular iteration k
+        T kalpha;                       // kalpha      = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
+        T kG;                           // kG          = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
+        T kGPrev;                       // kGPrev      = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
+        RowVectorXm<T> tSol(nGrid);     // tSol        = the independent variable t over the whole grid in the solution of the IVP solver                   -- (1xnGrid)
+        MatrixXm<T> xSol(n,nGrid);      // xSol        = the state vector x integrated over the whole grid in the solution of the IVP solver                -- (nxnGrid)
+        RowVectorXm<T> tSolP(nGrid);    // tSolP       = the independent variable t over the whole grid in the perturbed solution of the IVP solver         -- (1xnGrid)    
+        MatrixXm<T> xSolP(n,nGrid);     // xSolP       = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nxnGrid)
+        RowVectorXi BCCols(m);          // BCCols      = the columns in the grid that correspond to boundary values                                         -- (1xm)
+        VectorXm<T> kxt1(n);            // kxt1        = the computed initial state vector in the k-th iteration                                            -- (nx1)
+        VectorXm<T> kxt1P(n);           // kxt1        = the computed perturbed initial state vector in the k-th iteration                                  -- (nx1)
+        VectorXm<T> xt(n);              // xt          = the computed initial state vector to be input to the IVP solver                                    -- (nx1)
+        VectorXm<T> xtP(n);             // xtP         = the computed perturbed initial state vector to be input to the IVP solver                          -- (nx1)
+        VectorXm<T> kg(n);              // kg          = the boundary condition residues in the k-th iteration                                              -- (nx1)
+        VectorXm<T> kgj(n);             // kgj         = the j-th boundary condition perturbed system residues in the k-th iteration                        -- (nx1)
+        MatrixXm<T> kS(n,n);            // kS          = the adjusting matrix for correcting the initial condition k-th iteration                           -- (nxn) 
+        BVPSolution<T> bvpSolution;     // bvpSolution = the structure that stores the solution of the boundary value problem    
 
         // Variable definitions
         t0     = tBC(0);             
@@ -159,7 +167,7 @@ template <typename T> BVPSolution<T> nlmpBVP(
 
             // Solve the initial value problem   
             xt      = kxt1; // Assign the current initial condition state vector to a dummy variable
-            col     = 0;   // Set the solution column index to 0 before the IVP solver starts integrating
+            col     = 0;    // Set the solution column index to 0 before the IVP solver starts integrating
             integrate_const(StepperType<T>(), dxBydtWrapper, xt, t0, tm, h, storeSol); 
             kg = BCResidues(xSol(Eigen::all, BCCols));
             kG = kg.norm()/sqrt(n);
@@ -200,33 +208,33 @@ template <typename T> BVPSolution<T> nlmpBVP2(
     ){  
 
         // Variable declarations  
-        int i;                           // i         = the iterating variable that keeps track of the independent variable node                                -- [0,m-1]
-        int j;                           // j         = the inner iterating variable for IVAM                                                                   -- [0,n-1]
-        int k;                           // k         = the outer iterating variable for IVAM                                                                   -- [0,Inf)
-        int l;
-        int col;                         // col       = the column index of the x solution for the IVP solver                                                   -- [0,nGrid-1]
-        int colP;                        // colP      = the column index of the perturbed x solution for the IVP solver                                         -- [0,nGrid-1]
-        T h;                             // h         = the stepper step size for the IVP solver                                                            
-        T kepsilonj;                     // kepsilonj = the perturbation parameter for a state variable at a particular iteration k
-        T kalpha;                        // kalpha    = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
-        T kG;                            // kG        = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
-        T kGPrev;                        // kGPrev    = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
-        RowVectorXm<T> tSol(nGrid+m-2);  // tSol      = the independent variable t over the whole grid in the solution of the IVP solver                        -- (1x(nGrid+m-2))
-        MatrixXm<T> xSol(n,nGrid+m-2);   // xSol      = the state vector x integrated over the whole grid in the solution of the IVP solver                     -- (nx(nGrid+m-2)m)
-        RowVectorXm<T> tSolP(nGrid+m+2); // tSolP     = the independent variable t over the whole grid in the perturbed solution of the IVP solver              -- (1xnGrid)    
-        MatrixXm<T> xSolP(n,nGrid+m+2);  // xSolP     = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver           -- (nxnGrid)
-        RowVectorXi BCCols(m);           // BCCols    = the columns in the grid that correspond to boundary values                                         -- (1xm)
-        MatrixXm<T> kxt1(n,m-1);         // kxt1      = the computed initial state vector in the k-th iteration at the left side of every interval              -- (nx(m-1))
-        MatrixXm<T> kxtm(n,m-1);         // kxtm      = the computed final state vector in the k-th iteration at the left side of every interval                -- (nx(m-1))
-        MatrixXm<T> kxt1P(n,m-1);        // kxt1      = the computed perturbed initial state vector in the k-th iteration                                       -- (nx(m-1))
-        MatrixXm<T> kxtmP(n,m-1);        // kxtm      = the computed perturbed initial state vector in the k-th iteration                                       -- (nx(m-1))
-        VectorXm<T> xt(n);               // xt        = the computed state vector to be input to the IVP solver                                                 -- (nx1)
-        VectorXm<T> xtP(n);              // xtP       = the computed perturbed state vector to be input to the IVP solver                                       -- (nx1)
-        VectorXm<T> kg(n*(m-1));         // kg        = the boundary condition residues in the k-th iteration                                                   -- ((n(m-1))x1)
-        VectorXm<T> kgj(n*(m-1));        // kgj       = the j-th boundary condition perturbed system residues in the k-th iteration                             -- ((n(m-1))x1)
-        MatrixXm<T> kS(n*(m-1),n*(m-1)); // kS        = the adjusting matrix for correcting the initial condition k-th iteration                                -- ((n(m-1))x(n(m-1))) 
-        VectorXm<T> xt1Change(n*(m-1));
-        BVPSolution<T> bvpSolution;
+        int i;                           // i           = the iterating variable that keeps track of the integration interval                                -- [0,m-2]
+        int j;                           // j           = the iterating variable that keeps track of the state variable to perturb                           -- [0,n-1]
+        int k;                           // k           = the variable that keeps track of the iteration                                                     -- [0,Inf)
+        int l;                           // l           = equivalent to i, the iterating variable that keeps track of the integration interval to perturb    -- [0,m-2]
+        int col;                         // col         = the column index of the x solution for the IVP solver                                              -- [0,nGrid-1]
+        int colP;                        // colP        = the column index of the perturbed x solution for the IVP solver                                    -- [0,nGrid-1]
+        T h;                             // h           = the stepper step size for the IVP solver                                                            
+        T kepsilonj;                     // kepsilonj   = the perturbation parameter for a state variable at a particular iteration k
+        T kalpha;                        // kalpha      = the relaxation factor at a particular iteration k to scale the adjustment to the initial condition 
+        T kG;                            // kG          = the Root Mean Square (RMS) error of boundary residues at a particular iteration k
+        T kGPrev;                        // kGPrev      = the Root Mean Square (RMS) error of boundary residues at the previous iteration k-1
+        RowVectorXm<T> tSol(nGrid+m-2);  // tSol        = the independent variable t over the whole grid in the solution of the IVP solver                   -- (1x(nGrid+m-2))
+        MatrixXm<T> xSol(n,nGrid+m-2);   // xSol        = the state vector x integrated over the whole grid in the solution of the IVP solver                -- (nx(nGrid+m-2))
+        RowVectorXm<T> tSolP(nGrid+m-2); // tSolP       = the independent variable t over the whole grid in the perturbed solution of the IVP solver         -- (1x(nGrid+m-2))    
+        MatrixXm<T> xSolP(n,nGrid+m-2);  // xSolP       = the state vector x integrated over the whole grid in the perturbed solution of the IVP solver      -- (nx(nGrid+m-2))
+        RowVectorXi BCCols(m);           // BCCols      = the columns in the grid that correspond to boundary values                                         -- (1xm)
+        MatrixXm<T> kxt1(n,m-1);         // kxt1        = the computed initial state vector in the k-th iteration at the left side of every interval         -- (nx(m-1))
+        MatrixXm<T> kxtm(n,m-1);         // kxtm        = the computed final state vector in the k-th iteration at the right side of every interval          -- (nx(m-1))
+        MatrixXm<T> kxt1P(n,m-1);        // kxt1        = the computed perturbed initial state vector in the k-th iteration for every interval               -- (nx(m-1))
+        MatrixXm<T> kxtmP(n,m-1);        // kxtm        = the computed perturbed initial state vector in the k-th iteration for every interval               -- (nx(m-1))
+        VectorXm<T> xt(n);               // xt          = the computed state vector to be input to the IVP solver                                            -- (nx1)
+        VectorXm<T> xtP(n);              // xtP         = the computed perturbed state vector to be input to the IVP solver                                  -- (nx1)
+        VectorXm<T> kg(n*(m-1));         // kg          = the boundary condition residues in the k-th iteration                                              -- ((n(m-1))x1)
+        VectorXm<T> kgj(n*(m-1));        // kgj         = the j-th boundary condition perturbed system residues in the k-th iteration                        -- ((n(m-1))x1)
+        MatrixXm<T> kS(n*(m-1),n*(m-1)); // kS          = the adjusting matrix for correcting the initial condition k-th iteration                           -- ((n(m-1))x(n(m-1))) 
+        VectorXm<T> xt1Change(n*(m-1));  // xt1Change   = the computed change needed in initial values in the state vector for every iterval                 -- ((n(m-1))x1) 
+        BVPSolution<T> bvpSolution;      // bvpSolution = the structure that stores the solution of the boundary value problem
 
         // Variable definitions
         h = (tBC(tBC.cols()-1) - tBC(0))/(nGrid-1);
