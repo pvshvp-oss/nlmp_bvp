@@ -39,10 +39,15 @@ VectorXm<mpreal> dxBydt(mpreal t, VectorXm<mpreal> x){
 ***REMOVED*** // dxdt(1) = -fabs(x(0));
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** VectorXm<mpreal> dxdt(3);
-***REMOVED*** dxdt(0) = x(1);
-***REMOVED*** dxdt(1) = x(2);
-***REMOVED*** dxdt(2) = 25*x(1) - 1;
+***REMOVED*** // VectorXm<mpreal> dxdt(3);
+***REMOVED*** // dxdt(0) = x(1);
+***REMOVED*** // dxdt(1) = x(2);
+***REMOVED*** // dxdt(2) = 25*x(1) - 1;
+
+***REMOVED*** /* Boundary Value Problem 3 */
+***REMOVED*** VectorXm<mpreal> dxdt(2);
+***REMOVED*** dxdt(0) =  x(1);
+***REMOVED*** dxdt(1) = -x(0);
 
 ***REMOVED*** return dxdt;
 }
@@ -69,6 +74,27 @@ VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBC){
 }
 // ===================
 
+// ====================
+// Functions BCResidues
+// ====================
+// BCResidues***REMOVED***  = a function that defines the boundary condition residues...  -- (n(m-1)x1)
+//***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***...at the left and right state vectors xBCL and xBCR
+VectorXm<mpreal> BCResidues(MatrixXm<mpreal> xBCL, MatrixXm<mpreal> xBCR){
+***REMOVED*** /* Boundary Value Problem 3 */
+***REMOVED*** VectorXm<mpreal> residues(10);
+***REMOVED*** residues(0) = xBCL(0,0)-0;
+***REMOVED*** residues(1) = xBCL(1,4)-0;
+***REMOVED*** residues(2) = xBCR(0,0) - xBCL(0,1) - 1;
+***REMOVED*** residues(3) = xBCR(1,0) - xBCL(1,1) - 0;
+***REMOVED*** residues(4) = xBCR(1,1) - xBCL(1,2) + 1;
+***REMOVED*** residues(5) = xBCR(0,1) - xBCL(0,2) + 0;
+***REMOVED*** residues(6) = xBCR(0,2) - xBCL(0,3) - 1;
+***REMOVED*** residues(7) = xBCR(1,2) - xBCL(1,3) - (sqrt(3)-1);
+***REMOVED*** residues(8) = xBCR(0,3) - xBCL(0,4) - 0;
+***REMOVED*** residues(9) = xBCR(1,3) - xBCL(1,4) - 0;
+}
+
+
 // =================
 // The main function
 // =================
@@ -93,8 +119,12 @@ int main(
 ***REMOVED*** // VectorXm<mpreal>***REMOVED***oxt1(2);***REMOVED******REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** RowVectorXm<mpreal> tBC(3);***REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
-***REMOVED*** VectorXm<mpreal>***REMOVED***oxt1(3);***REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+***REMOVED*** // RowVectorXm<mpreal> tBC(3);***REMOVED******REMOVED******REMOVED***// t_BC***REMOVED******REMOVED******REMOVED***  = row vector of values at which the boundary conditions are specified***REMOVED******REMOVED******REMOVED******REMOVED***  -- (1xm)
+***REMOVED*** // VectorXm<mpreal>***REMOVED***oxt1(3);***REMOVED******REMOVED******REMOVED***// oxt1***REMOVED******REMOVED******REMOVED***  = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED***-- (nx1)
+
+***REMOVED*** /* Boundary Value Problem 3 */
+***REMOVED*** RowVectorXm<mpreal> tBC(6);
+***REMOVED*** VectorXm<mpreal>***REMOVED***oxt1(2); 
 
 ***REMOVED*** BVPSolution<mpreal> bvpSolution;***REMOVED******REMOVED*** // bvpSolution***REMOVED*** = the structure in which the solutions of the boundary value problem will be saved
 ***REMOVED*** IVAMParameters<mpreal> ivamParameters; // ivamParameters = parameters for the Initial Value Adjusting Method (IVAM)
@@ -110,11 +140,24 @@ int main(
 ***REMOVED*** //***REMOVED******REMOVED******REMOVED*** 0;
 
 ***REMOVED*** /* Boundary Value Problem 2 */
-***REMOVED*** tBC  << 0.0, 0.5, 1.0;***REMOVED******REMOVED******REMOVED*** // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
-***REMOVED*** oxt1 << 1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
-***REMOVED******REMOVED******REMOVED******REMOVED***1,
-***REMOVED******REMOVED******REMOVED******REMOVED***1;
-***REMOVED***
+***REMOVED*** // tBC  << 0.0, 0.5, 1.0;***REMOVED******REMOVED******REMOVED*** // tBC  = the values of the independent variable t at which boundary conditions are defined -- (1xm)
+***REMOVED*** // oxt1 << 1,***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** // oxt1 = column vector of the guessed initial state***REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED******REMOVED*** -- (nx1)
+***REMOVED*** //***REMOVED******REMOVED******REMOVED***1,
+***REMOVED*** //***REMOVED******REMOVED******REMOVED***1;
+
+***REMOVED*** /* Boundary Value Problem 3 */
+***REMOVED*** tBC  << 0.0, mpfr::const_pi()/6, mpfr::const_pi()/3, mpfr::const_pi()/2, 2*mpfr::const_pi()/3, mpfr::const_pi();
+***REMOVED*** oxt1 <<  0.1,
+***REMOVED******REMOVED******REMOVED******REMOVED***-0.6,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0.1,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0.1,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0.4,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0.9,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0.8,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 2.1,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0.9,
+***REMOVED******REMOVED******REMOVED******REMOVED*** 0.8;
+***REMOVED******REMOVED******REMOVED******REMOVED*** 
 ***REMOVED*** // Assign the parameters for IVAM
 ***REMOVED*** ivamParameters.EPSILON***REMOVED*** = 1e-10; // EPSILON***REMOVED*** = the state perturbation parameter to probe the differential equation system with
 ***REMOVED*** ivamParameters.ALPHA***REMOVED******REMOVED***= 1.0;***REMOVED***// ALPHA***REMOVED******REMOVED***= the relaxation factor to scale the adjustment to the initial condition
