@@ -6,7 +6,7 @@ Journal of Mathematical Analysis and Applications 69.2 (1979): 359-371.
 2. Welsh, Wayne, and Takeo Ojika. "Multipoint boundary value problems with discontinuities I. Algorithms and applications."  
 Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.  
   
-This was a tool written by [shivanandvp](https://github.com/shivanandvp) in response to the need for a suitable C++ alternative to bvp4c in Mathworks MATLAB.  
+This is a tool consisting of multiple header files written by [shivanandvp](https://github.com/shivanandvp) in response to the need for a suitable C++ alternative to bvp4c in Mathworks MATLAB.  
 You can use the `nlmpbvp.hpp` header file from this project to be able to call the functions `nlmpBVP` and `nlmpBVP2`.  
 However, this header file depends on other files too, so if you want to use this tool in your own projects, please either modify `test_nlmpBVP` or refer to `CMakeLists.txt` to find dependencies,
 
