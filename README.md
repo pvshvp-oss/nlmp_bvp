@@ -8,7 +8,7 @@ Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.
   
 This was project was written in response to the need for a suitable C++ alternative to bvp4c in Mathworks MATLAB.  
 
-## Output - test_nlmpBVP.cpp:
+## Output of sample user-side program - test_nlmpBVP.cpp:
 ```
 [shivanandvp@pattanshetti-inspiron nlmpbvp]$ /mnt/2E42F6A042F66BC9/Development/nlmpbvp/build/test_nlmpBVP
 
@@ -183,7 +183,7 @@ Program ended...
 [shivanandvp@pattanshetti-inspiron nlmpbvp]$
 ```
 
-## Source - test_nlmpBVP.cpp:
+## Source of sample user-side program - test_nlmpBVP.cpp:
 ```cpp
 // ========================================
 // Author: Shivanand Pattanshetti 
