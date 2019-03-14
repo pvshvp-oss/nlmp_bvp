@@ -8,7 +8,11 @@ Journal of Computational and Applied Mathematics 6.2 (1980): 133-143.
   
 This is a tool consisting of **multiple header files** written by [shivanandvp](https://github.com/shivanandvp) in response to the need for a suitable C++ alternative to bvp4c in Mathworks MATLAB.  
 You can use the `nlmpbvp.hpp` header file from this project to be able to call the functions `nlmpBVP` and `nlmpBVP2`.  
-However, this header file depends on other files too, so if you want to use this tool in your own projects, please either modify `test_nlmpBVP` or refer to `CMakeLists.txt` to find dependencies,
+However, this header file depends on other files too, so if you want to use this tool in your own projects, please either modify `test_nlmpBVP.cpp` or refer to `CMakeLists.txt` to find dependencies,
+
+>>>
+Note: The file `test_nlmpBVP.cpp` is only a sample file where you call the functions that are actually defined in the header files found in `include`
+>>>
 
 ## Output of sample user-side program - test_nlmpBVP.cpp:
 ```
