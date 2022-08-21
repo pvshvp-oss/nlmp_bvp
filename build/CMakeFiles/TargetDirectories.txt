@@ -1,3 +1,0 @@
-/mnt/2E42F6A042F66BC9/Development/nlmpbvp/build/CMakeFiles/rebuild_cache.dir
-/mnt/2E42F6A042F66BC9/Development/nlmpbvp/build/CMakeFiles/test_nlmpBVP.dir
-/mnt/2E42F6A042F66BC9/Development/nlmpbvp/build/CMakeFiles/edit_cache.dir
